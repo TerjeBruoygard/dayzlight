@@ -20,7 +20,7 @@
 // with this program; if not, write to the Free Software Foundation, Inc., 
 // 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -150,7 +150,7 @@ namespace MySql.Data.MySqlClient.Replication
           ReplicationServer server = group.GetServer(master, connection.Settings);
 
           if (server == null)
-            throw new MySqlException(Properties.Resources.Replication_NoAvailableServer);
+            throw new MySqlException(DayzlightAddon.MySql.Data.Properties.Resources.Replication_NoAvailableServer);
 
           try
           {

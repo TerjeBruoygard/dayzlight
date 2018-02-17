@@ -26,7 +26,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Collections;
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 
 namespace MySql.Data.Common
 {

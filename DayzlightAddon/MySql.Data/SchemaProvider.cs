@@ -30,7 +30,7 @@ using MySql.Data.Types;
 using System.Collections.Specialized;
 using System.Collections;
 using System.Text.RegularExpressions;
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 using System.Collections.Generic;
 #if !RT
 using System.Data;

@@ -34,7 +34,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Globalization;
 using System.Collections.Generic;
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 using MySql.Data.MySqlClient.Replication;
 
 namespace MySql.Data.MySqlClient

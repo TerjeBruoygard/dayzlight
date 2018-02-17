@@ -22,7 +22,7 @@
 
 using System.IO;
 using System;
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 using MySql.Data.Common;
 using System.Runtime.InteropServices;
 using System.Diagnostics;

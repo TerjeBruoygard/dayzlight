@@ -26,7 +26,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 using MySql.Data.Common;
 #if NET_40_OR_GREATER
 using System.Threading.Tasks;

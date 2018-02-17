@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MySql.Data.MySqlClient.Properties {
+namespace DayzlightAddon.MySql.Data.Properties {
     using System;
     
     
@@ -19,7 +19,7 @@ namespace MySql.Data.MySqlClient.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -39,7 +39,7 @@ namespace MySql.Data.MySqlClient.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MySql.Data.MySqlClient.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DayzlightAddon.MySql.Data.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -549,7 +549,17 @@ namespace MySql.Data.MySqlClient.Properties {
         ///DETERMINISTIC
         ///DISTINCT
         ///DISTINCTROW
-        ///D [rest of string was truncated]&quot;;.
+        ///DIV
+        ///DO
+        ///DOUBLE
+        ///DROP
+        ///DUAL
+        ///EACH
+        ///ELSE
+        ///ELSEIF
+        ///ENCLOSED
+        ///END
+        ///ESC [rest of string was truncated]&quot;;.
         /// </summary>
         public static string keywords {
             get {

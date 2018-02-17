@@ -26,7 +26,7 @@ using System.Diagnostics;
 using System.IO;
 using MySql.Data.Common;
 using MySql.Data.Types;
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 using System.Text;
 using MySql.Data.MySqlClient.Authentication;
 using System.Reflection;
@@ -336,7 +336,7 @@ namespace MySql.Data.MySqlClient
       if (Settings.CertificateFile != null)
       {
         if (!Version.isAtLeast(5, 1, 0))
-          throw new MySqlException(Properties.Resources.FileBasedCertificateNotSupported);
+          throw new MySqlException(DayzlightAddon.MySql.Data.Properties.Resources.FileBasedCertificateNotSupported);
 
         X509Certificate2 clientCert = new X509Certificate2(Settings.CertificateFile,
             Settings.CertificatePassword);

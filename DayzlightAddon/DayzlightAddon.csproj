@@ -55,13 +55,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DllExport, PublicKeyToken=8337224c9ad9e356">
-      <HintPath>$(SolutionDir)packages\DllExport.1.6.0\gcache\metalib\$(DllExportNamespace)\$(DllExportMetaLibName)</HintPath>
+      <HintPath>$(SolutionDir)External\DllExport\gcache\metalib\$(DllExportNamespace)\$(DllExportMetaLibName)</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="RGiesecke.DllExport.Metadata">
-      <HintPath>..\packages\UnmanagedExports.1.2.7\lib\net\RGiesecke.DllExport.Metadata.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel" />
@@ -89,10 +85,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Addons\dayzlight\%24PBOPREFIX%24" />
-    <None Include="Addons\dayzlight\%24PREFIX%24" />
-    <None Include="Addons\dayzlight\init.sqf" />
-    <None Include="packages.config" />
+    <None Include="DayzlightAddon.sqf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MySql.Data\Authentication\AuthenticationManager.cs">
@@ -237,24 +232,17 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Addons\dayzlight\PboPrefix.txt" />
-    <Content Include="mod.cpp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)packages\DllExport.1.6.0\tools\net.r_eg.DllExport.targets" Condition="Exists('$(SolutionDir)packages\DllExport.1.6.0\tools\net.r_eg.DllExport.targets')" Label="8337224c9ad9e356" />
+  <Import Project="$(SolutionDir)External\DllExport\tools\net.r_eg.DllExport.targets" Condition="Exists('$(SolutionDir)External\DllExport\tools\net.r_eg.DllExport.targets')" Label="8337224c9ad9e356" />
   <Target Name="DllExportRPkgDynamicImport" BeforeTargets="PostBuildEvent" DependsOnTargets="GetFrameworkPaths" Condition="'$(DllExportModImported)' != 'true' And '$(DllExportRPkgDyn)' != 'false'">
     <MSBuild BuildInParallel="true" UseResultsCache="true" Projects="$(MSBuildProjectFullPath)" Properties="DllExportRPkgDyn=true" Targets="Build" />
   </Target>
-  <Import Project="../packages/UnmanagedExports.1.2.7/tools/RGiesecke.DllExport.targets" Condition="Exists('../packages/UnmanagedExports.1.2.7/tools/RGiesecke.DllExport.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>mkdir "$(TargetDir)Addons"
-echo Building addon in .pbo
-"$(SolutionDir)Tools\PBOConsole.exe" -pack "$(ProjectDir)Addons\dayzlight" "$(TargetDir)Addons\dayzlight.pbo"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>rmdir /Q /S "$(TargetDir)Addons"</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>

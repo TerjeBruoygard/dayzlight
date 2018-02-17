@@ -28,7 +28,7 @@ namespace MySql.Data.MySqlClient.Memcached
   using System.IO;
   using System.Net;
   using MySql.Data.Common;
-  using MySql.Data.MySqlClient.Properties;
+  using DayzlightAddon.MySql.Data.Properties;
 
   /// <summary>
   /// An interface of the client memcached protocol. This class is abstract for 

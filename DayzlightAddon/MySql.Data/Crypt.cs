@@ -23,7 +23,7 @@
 using System;
 using System.Globalization;
 using MySql.Data.Common;
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 using System.Security.Cryptography;
 #if RT
 using MySql.Data.MySqlClient.RT;

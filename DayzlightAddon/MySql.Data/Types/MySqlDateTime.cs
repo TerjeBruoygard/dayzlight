@@ -192,7 +192,7 @@ namespace MySql.Data.Types
       set
       {
         if (value < 0 || value > 999)
-          throw new ArgumentOutOfRangeException("Millisecond", MySqlClient.Properties.Resources.InvalidMillisecondValue);
+          throw new ArgumentOutOfRangeException("Millisecond", DayzlightAddon.MySql.Data.Properties.Resources.InvalidMillisecondValue);
         millisecond = value;
         microsecond = value * 1000;
       }
@@ -207,7 +207,7 @@ namespace MySql.Data.Types
       set
       {
         if (value < 0 || value > 999999)
-          throw new ArgumentOutOfRangeException("Microsecond", MySqlClient.Properties.Resources.InvalidMicrosecondValue);
+          throw new ArgumentOutOfRangeException("Microsecond", DayzlightAddon.MySql.Data.Properties.Resources.InvalidMicrosecondValue);
         microsecond = value;
         millisecond = value / 1000;
       }

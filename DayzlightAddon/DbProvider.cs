@@ -26,14 +26,15 @@ namespace DayzlightAddon
             var cmd = dbConn_.CreateCommand();
             cmd.CommandText =
                 "CREATE TABLE IF NOT EXISTS `dayzlight_init_v" + GetVersion() + "` (" +
-                "`id`           int UNSIGNED NOT NULL," +
-                "`worldname`    varchar(255) NOT NULL," +
-                "`mincorner_x`  double NOT NULL," +
-                "`mincorner_y`  double NOT NULL," +
-                "`maxcorner_x`  double NOT NULL," +
-                "`maxcorner_y`  double NOT NULL," +
-                "`spawnpos_x`   double NOT NULL," +
-                "`spawnpos_y`   double NOT NULL," +
+                "`id`            int UNSIGNED NOT NULL," +
+                "`worldname`     varchar(255) NOT NULL," +
+                "`mincorner_x`   double NOT NULL," +
+                "`mincorner_y`   double NOT NULL," +
+                "`maxcorner_x`   double NOT NULL," +
+                "`maxcorner_y`   double NOT NULL," +
+                "`spawnpos_x`    double NOT NULL," +
+                "`spawnpos_y`    double NOT NULL," +
+                "`cleanup_plmov` double NOT NULL," + 
                 "PRIMARY KEY(`id`)" +
             ");";
             cmd.ExecuteNonQuery();
@@ -42,9 +43,9 @@ namespace DayzlightAddon
             cmd = dbConn_.CreateCommand();
             cmd.CommandText =
                 "INSERT INTO `dayzlight_init_v" + GetVersion() + "` " + 
-                    "(`id`, `worldname`, `mincorner_x`, `mincorner_y`, `maxcorner_x`, `maxcorner_y`, `spawnpos_x`, `spawnpos_y`) " +
+                    "(`id`, `worldname`, `mincorner_x`, `mincorner_y`, `maxcorner_x`, `maxcorner_y`, `spawnpos_x`, `spawnpos_y`, `cleanup_plmov`) " +
                 "VALUES(1, " +
-                    "@worldname, @mincorner_x, @mincorner_y, @maxcorner_x, @maxcorner_y, @spawnpos_x, @spawnpos_y) " +
+                    "@worldname, @mincorner_x, @mincorner_y, @maxcorner_x, @maxcorner_y, @spawnpos_x, @spawnpos_y, @cleanup_plmov) " +
                 "ON DUPLICATE KEY UPDATE " + 
                     "worldname = @worldname, " + 
                     "mincorner_x = @mincorner_x, mincorner_y = @mincorner_y, " +
@@ -57,6 +58,7 @@ namespace DayzlightAddon
             cmd.Parameters.AddWithValue("@maxcorner_y", maxCourner[1]);
             cmd.Parameters.AddWithValue("@spawnpos_x", spawnPoint[0]);
             cmd.Parameters.AddWithValue("@spawnpos_y", spawnPoint[1]);
+            cmd.Parameters.AddWithValue("@cleanup_plmov", new TimeSpan(1, 0, 0, 0, 0).TotalMilliseconds);
             cmd.ExecuteNonQuery();
 
             // Create players movment table

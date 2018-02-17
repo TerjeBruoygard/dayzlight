@@ -29,7 +29,7 @@ using MySql.Data.Common;
 using System.Collections;
 using MySql.Data.Types;
 using System.Globalization;
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 using System.Collections.Generic;
 
 namespace MySql.Data.MySqlClient

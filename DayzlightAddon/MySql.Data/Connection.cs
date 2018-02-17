@@ -33,7 +33,7 @@ using System.Drawing.Design;
 using System.Text;
 using MySql.Data.Common;
 using System.Diagnostics;
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 using MySql.Data.MySqlClient.Replication;
 #if NET_40_OR_GREATER
 using System.Threading.Tasks;

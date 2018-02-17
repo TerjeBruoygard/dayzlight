@@ -23,7 +23,7 @@
 using System;
 using System.Collections;
 using System.Data;
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 using MySql.Data.Types;
 using System.Diagnostics;
 using System.Collections.Generic;

@@ -26,7 +26,7 @@ using System.Globalization;
 using System.Text;
 using MySql.Data.Common;
 using MySql.Data.Types;
-using MySql.Data.MySqlClient.Properties;
+using DayzlightAddon.MySql.Data.Properties;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Security;

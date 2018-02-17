@@ -21,6 +21,7 @@ if (_result == "OK") then {
 		_plmov = [];
 		{
 			_plmov set [count _plmov, [getPlayerUID _x, getPos _x, getDir _x]];
+			uiSleep 0.1;
 		} forEach playableUnits;
 
 		_result = DAYZLIGHT_DLLNAME callExtension str [DAYZLIGHT_EXTFNC_STAT, [_plmov]];
