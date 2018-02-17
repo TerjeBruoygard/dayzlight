@@ -66,8 +66,10 @@ namespace MySql.Data.MySqlClient
       ccdc.Add(ccd);
 
       if (!PerformanceCounterCategory.Exists(Resources.PerfMonCategoryName))
-        PerformanceCounterCategory.Create(Resources.PerfMonCategoryName, null, ccdc);
-    }
+#pragma warning disable CS0618 // Type or member is obsolete
+            PerformanceCounterCategory.Create(Resources.PerfMonCategoryName, null, ccdc);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
 #endif
 
 #pragma warning disable CS0114 // Member hides inherited member; missing override keyword

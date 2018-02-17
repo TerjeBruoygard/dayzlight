@@ -12,11 +12,24 @@ namespace DayzlightAddonTests
 
         static void Main(string[] args)
         {
-            var output = new StringBuilder();
-            var outputSize = 1024;
-            var function = $"[INIT,[{DbRedentials},namalsk,[0,12800],[0,12800],[78,112.5]]]";
-            AddonWrapper.RVExtension(output, outputSize, function);
-            Console.WriteLine(output.ToString());
+            try
+            {
+                Console.Write("Initialize server...");
+                AddonWrapper.RVExtensionManaged(
+                    $"[\"INIT\",[\"{DbRedentials}\",\"namalsk\",[0,12800],[0,12800],[78,112.5]]]"
+                );
+                Console.WriteLine("OK");
+
+                // Write test data
+                // TODO
+
+                Console.WriteLine("All tests compleated.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR:");
+                Console.WriteLine(ex);
+            }
         }
     }
 }
