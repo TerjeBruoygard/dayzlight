@@ -1,0 +1,24 @@
+﻿@model DayzlightWebapp.Models.SigninModel
+
+<div class="container auth-body">
+    @using (@Html.BeginForm("Login", "Auth", FormMethod.Post, new { @class = "form-signin" }))
+    {
+        @Html.AntiForgeryToken();
+        <h2 class="form-signin-heading">Please sign in</h2>
+        @Html.ValidationSummary(true);
+    
+        @Html.LabelFor(x => x.Login);
+        @Html.TextBoxFor(x => x.Login, new { @class = "form-control" });
+        @Html.ValidationMessageFor(x => x.Login);
+
+        @Html.LabelFor(x => x.Password);
+        @Html.PasswordFor(x => x.Password, new { @class = "form-control" });
+        @Html.ValidationMessageFor(x => x.Password);
+        <div class="checkbox">
+            <label>
+                @Html.EditorFor(x => x.RememberMe) Remember me
+            </label>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    }
+</div>

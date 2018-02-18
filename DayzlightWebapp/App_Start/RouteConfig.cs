@@ -17,11 +17,6 @@ namespace DayzlightWebapp
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "General", id = UrlParameter.Optional }
             );
-            routes.MapRoute(
-                "Unauthorized",
-                "{*catchall}",
-                new { controller = "Home", action = "Auth" }
-            );
         }
     }
 }

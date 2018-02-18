@@ -369,19 +369,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Providers\AuthProvider.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Providers\RoleProvider.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.cs" />
+    <Compile Include="Controllers\AuthController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\SigninModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Custom.css" />
     <Content Include="Content\Pictures\logo.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -418,11 +423,10 @@
     <Content Include="Views\Home\Users.cshtml" />
     <Content Include="Views\Home\General.cshtml" />
     <Content Include="Views\Home\Tools.cshtml" />
-    <Content Include="Views\Home\Auth.cshtml" />
+    <Content Include="Views\Auth\Login.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

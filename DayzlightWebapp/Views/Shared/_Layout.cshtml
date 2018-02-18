@@ -22,12 +22,23 @@
 
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav navbar-left">
                     <li>@Html.ActionLink("General", "General", "Home")</li>
                     <li>@Html.ActionLink("Livemap", "Livemap", "Home")</li>
                     <li>@Html.ActionLink("Users", "Users", "Home")</li>
                     <li>@Html.ActionLink("Tools", "Tools", "Home")</li>
                 </ul>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            @using (@Html.BeginForm("Logout", "Auth", FormMethod.Get))
+                            {
+                                <button class="btn btn-link btn-logout" type="submit">Logout</button>
+                            }
+                        </li>
+                    </ul>
+                }
             </div>
         </div>
     </div>
