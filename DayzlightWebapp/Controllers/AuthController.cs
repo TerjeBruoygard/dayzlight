@@ -28,7 +28,7 @@ namespace DayzlightWebapp.Controllers
             if (ModelState.IsValid)
             {
                 var authProvider = new AuthProvider();
-                if (authProvider.Login(signinModel.Login, signinModel.Password))
+                if (authProvider.Login(signinModel))
                 {
                     FormsAuthentication.SetAuthCookie(signinModel.Login, signinModel.RememberMe);
                     if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")

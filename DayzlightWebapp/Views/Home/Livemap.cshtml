@@ -6,9 +6,8 @@
 <script>
     var canvas = document.getElementById("map-canvas");
     var mapimg = new Image;
-    var mapwidth = @Html.Raw(Model.Width);
-    var mapheight = @Html.Raw(Model.Height);
-
+    var mapwidth = @Html.Raw(Model.ServerInfo.MaxCornerX - Model.ServerInfo.MinCornerX);
+    var mapheight = @Html.Raw(Model.ServerInfo.MaxCornerY - Model.ServerInfo.MinCornerY);
     window.onload = function () {
         var ctx = canvas.getContext('2d');
         trackTransforms(ctx);
@@ -129,7 +128,7 @@
         canvas.addEventListener('mousewheel', handleScroll, false);
     };
 
-    mapimg.src = '@Html.Raw("/Content/Maps/" + Model.Name + "/satellite.png")';
+    mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerInfo.WorldName + "/satellite.png")';
     function trackTransforms(ctx) {
         var svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         var xform = svg.createSVGMatrix();

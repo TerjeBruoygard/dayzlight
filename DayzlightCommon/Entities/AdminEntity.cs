@@ -14,10 +14,13 @@ namespace DayzlightCommon.Entities
         [Index(IsUnique = true)]
         [Required]
         [StringLength(255)]
+        [Display(Name = "Login")]
         public String Login { get; set; }
 
         [Required]
         [StringLength(255)]
+        [Display(Name = "Password")]
+        [DataType(DataType.Password)]
         public String Password { get; set; }
     }
 }

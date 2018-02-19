@@ -1,4 +1,6 @@
 ﻿using DayzlightWebapp.Models;
+using DayzlightWebapp.Providers;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace DayzlightWebapp.Controllers
@@ -13,12 +15,13 @@ namespace DayzlightWebapp.Controllers
 
         public ActionResult Livemap()
         {
-            return View(new LivemapModel()
+            using (var db = new DbProvider())
             {
-                Name = "namalsk",
-                Width = 12800,
-                Height = 12800
-            });
+                return View(new LivemapModel()
+                {
+                    ServerInfo = db.ServerInfo.FirstOrDefault()
+                });
+            }
         }
 
         public ActionResult Users()

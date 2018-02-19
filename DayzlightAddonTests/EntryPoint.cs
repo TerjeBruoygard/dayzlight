@@ -21,7 +21,7 @@ namespace DayzlightAddonTests
                 // Initialize server
                 Console.Write("Initialize server...");
                 AddonWrapper.RVExtensionManaged(
-                    $"[\"INIT\",[\"{DbRedentials}\",\"namalsk\",[0,12800],[0,12800],[78,112.5]]]"
+                    $"[\"INIT\",[\"{DbRedentials}\",\"namalsk\",[0,0],[12800,12800],[78,112.5]]]"
                 );
                 Console.WriteLine("OK");
 

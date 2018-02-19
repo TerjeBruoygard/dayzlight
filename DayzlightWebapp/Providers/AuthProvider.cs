@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DayzlightWebapp.Models;
+using System;
 using System.Linq;
 
 namespace DayzlightWebapp.Providers
@@ -7,9 +8,9 @@ namespace DayzlightWebapp.Providers
     {
         private DbProvider db_ = new DbProvider();
 
-        public bool Login(string login, string pass)
+        public bool Login(SigninModel singin)
         {
-            return db_.Admins.First(x => x.Login.Equals(login))?.Password.Equals(pass) == true;
+            return db_.Admins.FirstOrDefault(x => x.Login.Equals(singin.Login))?.Password.Equals(singin.Password) == true;
         }
 
         public void Dispose()

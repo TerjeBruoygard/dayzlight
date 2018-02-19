@@ -1,19 +1,10 @@
-﻿using System;
+﻿using DayzlightCommon.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace DayzlightWebapp.Models
 {
-    public class SigninModel
+    public class SigninModel : AdminEntity
     {
-        [Required]
-        [Display(Name = "Login")]
-        public string Login { get; set; }
-
-        [Required]
-        [Display(Name = "Password")]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-
         public bool RememberMe { get; set; }
     }
 }
