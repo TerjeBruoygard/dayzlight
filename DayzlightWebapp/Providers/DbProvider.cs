@@ -2,20 +2,26 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using MySql.Data.Entity;
+using System.Data.Common;
+using System.Data.Entity;
+using DayzlightCommon.Providers;
 
 namespace DayzlightWebapp.Providers
 {
-    public class DbProvider
+    public class DbProvider : DbProviderBase
     {
         private static readonly string dbCredentials_ = File.ReadAllText(
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DB.ini")
         );
-
-        public MySqlConnection CreateConnection()
+        
+        public DbProvider(bool autoOpen = true)
+            : base(new MySqlConnection(dbCredentials_))
         {
-            var dbConn_ = new MySqlConnection(dbCredentials_);
-            dbConn_.Open();
-            return dbConn_;
+            if (autoOpen)
+            {
+                Database.Connection.Open();
+            }
         }
     }
 }

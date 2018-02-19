@@ -1,18 +1,41 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Owin;
+﻿using DayzlightCommon.Entities;
+using DayzlightWebapp.Providers;
+using System;
+using System.Linq;
 
-[assembly: OwinStartup(typeof(DayzlightWebapp.Startup))]
 namespace DayzlightWebapp
 {
-    public class Startup
+    public static class Startup
     {
-        public void ConfigureServices(IServiceCollection services)
+        public static void Register()
         {
-            services.AddMvc();
-            services.AddAuthorization(options =>
+            using (var contextDB = new DbProvider(false))
             {
-                options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole("Administrator"));
-            });
+                contextDB.Database.CreateIfNotExists();
+                contextDB.Open();
+
+                using (var transaction = contextDB.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        if (contextDB.Admins.Count() == 0)
+                        {
+                            contextDB.Admins.Add(new AdminEntity()
+                            {
+                                Login = "admin",
+                                Password = "admin"
+                            });
+                        }
+                        contextDB.SaveChanges();
+                        transaction.Commit();
+                    }
+                    catch(Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw ex;
+                    }
+                }
+            }
         }
     }
 }
