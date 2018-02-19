@@ -1,9 +1,6 @@
 ﻿if (!isDedicated) exitWith {};
 diag_log format["[DAYZLIGHT] Start initializing..."];
-
-DAYZLIGHT_DB_CREDENTIALS = "Persist Security Info=False;server=localhost;database=namalsk_reloaded;uid=mysql;password=mysql";
-
-// DO NOT EDIT BELOW!
+DAYZLIGHT_DB_CREDENTIALS = loadFile "DB.ini";
 DAYZLIGHT_DLLNAME = "DayzlightAddon";
 DAYZLIGHT_EXTFNC_INIT = "INIT";
 DAYZLIGHT_EXTFNC_STAT = "STAT";
