@@ -4,7 +4,7 @@ using System.Collections;
 using System.Globalization;
 using System.Collections.Generic;
 
-namespace DayzlightAddon
+namespace DayzlightCommon.Utils
 {
     public class A2Array : IEnumerable<A2Array>
     {

@@ -1,13 +1,17 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DayzlightCommon.Entities {
     public class ServerInfoEntity
     {
         [Key]
-		public Int64 Id { get; set; }
-
         [Required]
+        [Index(IsUnique = true)]
+        public Int64 Id { get; set; }
+        
+        [Required]
+        [StringLength(255)]
         public String WorldName { get; set; }
 
         [Required]

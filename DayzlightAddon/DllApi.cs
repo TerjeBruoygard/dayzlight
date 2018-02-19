@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using RGiesecke.DllExport;
+using DayzlightCommon.Utils;
+using DayzlightAddon.Providers;
 
 namespace DayzlightAddon
 {
@@ -32,8 +34,6 @@ namespace DayzlightAddon
             output.Append(result);
         }
 
-        public static string DbCredentials = null;
-
         public static void RVExtensionManaged(string data)
         {
             A2Array request = A2Array.Deserialize(data);
@@ -42,24 +42,18 @@ namespace DayzlightAddon
             switch (fncName)
             {
                 case "INIT":
-                    DbCredentials = fncArgs[0];
-                    new DbProvider(DbCredentials).ServerInit(fncArgs[1], fncArgs[2], fncArgs[3], fncArgs[4]);
+                    DbProvider.Initialize(fncArgs[0]);
+                    using (var addonProvider = new AddonProvider())
+                    {
+                        addonProvider.ServerInit(fncArgs);
+                    }
                     break;
 
                 case "STAT":
-                    var fncArgsPlmovs = fncArgs[0];
-                    var plmov = new PlayersMovement[fncArgsPlmovs.Length()];
-                    for(int i = 0; i < plmov.Length; ++i)
+                    using (var addonProvider = new AddonProvider())
                     {
-                        var fncArgsPlmov = fncArgsPlmovs[i];
-                        plmov[i] = new PlayersMovement()
-                        {
-                            uid_ = UInt64.Parse(fncArgsPlmov[0]),
-                            pos_ = fncArgsPlmov[1],
-                            dir_ = fncArgsPlmov[2]
-                        };
-                    }                  
-                    new DbProvider(DbCredentials).UpdatePlayersMovement(plmov);
+                        addonProvider.UpdatePlayersMovement(fncArgs);
+                    }
                     break;
 
                 default:
