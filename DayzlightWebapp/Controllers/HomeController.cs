@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using DayzlightWebapp.Models;
+using System.Web.Mvc;
 
 namespace DayzlightWebapp.Controllers
 {
@@ -12,8 +13,12 @@ namespace DayzlightWebapp.Controllers
 
         public ActionResult Livemap()
         {
-            ViewBag.Message = "Your Livemap page.";
-            return View();
+            return View(new LivemapModel()
+            {
+                Name = "namalsk",
+                Width = 12800,
+                Height = 12800
+            });
         }
 
         public ActionResult Users()

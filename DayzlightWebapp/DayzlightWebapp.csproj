@@ -369,6 +369,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\LivemapModel.cs" />
     <Compile Include="Providers\AuthProvider.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="Providers\RoleProvider.cs" />
@@ -387,6 +388,7 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\Custom.css" />
+    <Content Include="Content\Maps\namalsk\satellite.png" />
     <Content Include="Content\Pictures\logo.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />

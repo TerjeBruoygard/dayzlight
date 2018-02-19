@@ -1,4 +1,14 @@
-﻿.btn-logout {
+﻿.div-map {
+    overflow: hidden;
+    position: fixed;
+    top: 50px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+}
+
+.btn-logout {
     width: 100%;
     padding: 14px 10px !important;
     text-align: left !important;
