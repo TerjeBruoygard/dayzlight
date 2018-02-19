@@ -56,10 +56,26 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Costura, Version=1.6.2.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Costura.Fody.1.6.2\lib\dotnet\Costura.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="DllExport, PublicKeyToken=8337224c9ad9e356">
       <HintPath>$(SolutionDir)External\DllExport\gcache\metalib\$(DllExportNamespace)\$(DllExportMetaLibName)</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.8.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.6.8.8\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data.Entity.EF6, Version=6.8.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.Entity.6.8.8\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel" />
@@ -93,149 +109,10 @@
     <None Include="Dayzlight\DayzlightAddon.sqf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MySql.Data\Authentication\AuthenticationManager.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MySql.Data\Authentication\MySQLAuthenticationPlugin.cs" />
-    <Compile Include="MySql.Data\Authentication\NativePasswordPlugins.cs" />
-    <Compile Include="MySql.Data\Authentication\Sha256AuthenticationPlugin.cs" />
-    <Compile Include="MySql.Data\Authentication\WindowsAuthenticationPlugin.cs" />
-    <Compile Include="MySql.Data\BulkLoader.cs" />
-    <Compile Include="MySql.Data\CharSetMap.cs" />
-    <Compile Include="MySql.Data\command.cs" />
-    <Compile Include="MySql.Data\CommandBuilder.cs" />
-    <Compile Include="MySql.Data\common\Cache.cs" />
-    <Compile Include="MySql.Data\common\ContextString.cs" />
-    <Compile Include="MySql.Data\common\LowResolutionStopwatch.cs" />
-    <Compile Include="MySql.Data\common\MyNetworkStream.cs" />
-    <Compile Include="MySql.Data\common\MySqlTokenizer.cs" />
-    <Compile Include="MySql.Data\common\NamedPipeStream.cs" />
-    <Compile Include="MySql.Data\common\NativeMethods.cs" />
-    <Compile Include="MySql.Data\common\Platform.cs" />
-    <Compile Include="MySql.Data\common\QueryNormalizer.cs" />
-    <Compile Include="MySql.Data\common\SharedMemoryStream.cs" />
-    <Compile Include="MySql.Data\common\StreamCreator.cs" />
-    <Compile Include="MySql.Data\common\StringUtility.cs" />
-    <Compile Include="MySql.Data\common\Version.cs" />
-    <Compile Include="MySql.Data\CompressedStream.cs" />
-    <Compile Include="MySql.Data\Connection.cs" />
-    <Compile Include="MySql.Data\Crypt.cs" />
-    <Compile Include="MySql.Data\dataadapter.cs" />
-    <Compile Include="MySql.Data\datareader.cs" />
-    <Compile Include="MySql.Data\Driver.cs" />
-    <Compile Include="MySql.Data\Exception.cs" />
-    <Compile Include="MySql.Data\extensions\NonRT\MySqlCommand.cs" />
-    <Compile Include="MySql.Data\extensions\NonRT\MySqlConnection.cs" />
-    <Compile Include="MySql.Data\extensions\NonRT\MySqlConnectionStringBuilder.cs" />
-    <Compile Include="MySql.Data\extensions\NonRT\MySqlDataReader.cs" />
-    <Compile Include="MySql.Data\extensions\NonRT\MySqlDateTime.cs" />
-    <Compile Include="MySql.Data\extensions\NonRT\MySqlParameter.cs" />
-    <Compile Include="MySql.Data\extensions\NonRT\MySqlParameterCollection.cs" />
-    <Compile Include="MySql.Data\extensions\NonRT\MySqlTrace.cs" />
-    <Compile Include="MySql.Data\extensions\NonRT\MySqlTransaction.cs" />
-    <Compile Include="MySql.Data\Field.cs" />
-    <Compile Include="MySql.Data\Installer.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="MySql.Data\Interceptors\CommandInterceptor.cs" />
-    <Compile Include="MySql.Data\Interceptors\Interceptor.cs" />
-    <Compile Include="MySql.Data\Interceptors\ExceptionInterceptor.cs" />
-    <Compile Include="MySql.Data\ISSchemaProvider.cs" />
-    <Compile Include="MySql.Data\Memcached\BinaryClient.cs" />
-    <Compile Include="MySql.Data\Memcached\MemcachedException.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MySql.Data\Memcached\TextClient.cs" />
-    <Compile Include="MySql.Data\Memcached\Client.cs" />
-    <Compile Include="MySql.Data\MySqlClientFactory.cs" />
-    <Compile Include="MySql.Data\MySqlClientPermission.cs" />
-    <Compile Include="MySql.Data\MySqlConfiguration.cs" />
-    <Compile Include="MySql.Data\MySqlConnectionStringBuilder.cs" />
-    <Compile Include="MySql.Data\MysqlDefs.cs" />
-    <Compile Include="MySql.Data\MySqlError.cs" />
-    <Compile Include="MySql.Data\MySqlHelper.cs" />
-    <Compile Include="MySql.Data\MySqlPacket.cs" />
-    <Compile Include="MySql.Data\MySqlClientPermissionAttribute.cs" />
-    <Compile Include="MySql.Data\MySqlPool.cs" />
-    <Compile Include="MySql.Data\MySqlPoolManager.cs" />
-    <Compile Include="MySql.Data\MySqlPromotableTransaction.cs" />
-    <Compile Include="MySql.Data\MySqlScript.cs" />
-    <Compile Include="MySql.Data\MySqlSecurityPermission.cs" />
-    <Compile Include="MySql.Data\MySqlStream.cs" />
-    <Compile Include="MySql.Data\NativeDriver.cs" />
-    <Compile Include="MySql.Data\parameter.cs" />
-    <Compile Include="MySql.Data\parameter_collection.cs" />
-    <Compile Include="MySql.Data\PerformanceMonitor.cs" />
-    <Compile Include="MySql.Data\PreparableStatement.cs" />
-    <Compile Include="MySql.Data\ProcedureCache.cs" />
-    <Compile Include="MySql.Data\Replication\ReplicationConfiguration.cs" />
-    <Compile Include="MySql.Data\Replication\ReplicationManager.cs" />
-    <Compile Include="MySql.Data\Replication\ReplicationRoundRobinServerGroup.cs" />
-    <Compile Include="MySql.Data\Replication\ReplicationServer.cs" />
-    <Compile Include="MySql.Data\Replication\ReplicationServerGroup.cs" />
-    <Compile Include="MySql.Data\ResultSet.cs" />
-    <Compile Include="MySql.Data\Schema.cs" />
-    <Compile Include="MySql.Data\SchemaProvider.cs" />
-    <Compile Include="MySql.Data\Statement.cs" />
-    <Compile Include="MySql.Data\StoredProcedure.cs" />
-    <Compile Include="MySql.Data\SystemPerformanceMonitor.cs" />
-    <Compile Include="MySql.Data\TableCache.cs" />
-    <Compile Include="MySql.Data\TimedStream.cs" />
-    <Compile Include="MySql.Data\TracingDriver.cs" />
-    <Compile Include="MySql.Data\transaction.cs" />
-    <Compile Include="MySql.Data\Types\MetaData.cs" />
-    <Compile Include="MySql.Data\Types\MySqlBinary.cs" />
-    <Compile Include="MySql.Data\Types\MySqlBit.cs" />
-    <Compile Include="MySql.Data\Types\MySqlByte.cs" />
-    <Compile Include="MySql.Data\Types\MySqlConversionException.cs" />
-    <Compile Include="MySql.Data\Types\MySqlDateTime.cs" />
-    <Compile Include="MySql.Data\Types\MySqlDecimal.cs" />
-    <Compile Include="MySql.Data\Types\MySqlDouble.cs" />
-    <Compile Include="MySql.Data\Types\MySqlGeometry.cs" />
-    <Compile Include="MySql.Data\Types\MySqlGuid.cs" />
-    <Compile Include="MySql.Data\Types\MySqlInt16.cs" />
-    <Compile Include="MySql.Data\Types\MySqlInt32.cs" />
-    <Compile Include="MySql.Data\Types\MySqlInt64.cs" />
-    <Compile Include="MySql.Data\Types\MySqlSingle.cs" />
-    <Compile Include="MySql.Data\Types\MySqlString.cs" />
-    <Compile Include="MySql.Data\Types\MySqlTime.cs" />
-    <Compile Include="MySql.Data\Types\MySqlUByte.cs" />
-    <Compile Include="MySql.Data\Types\MySqlUInt16.cs" />
-    <Compile Include="MySql.Data\Types\MySqlUInt32.cs" />
-    <Compile Include="MySql.Data\Types\MySqlUInt64.cs" />
-    <Compile Include="MySql.Data\Types\MySqlValue.cs" />
-    <Compile Include="MySql.Data\zlib\Adler32.cs" />
-    <Compile Include="MySql.Data\zlib\Deflate.cs" />
-    <Compile Include="MySql.Data\zlib\InfBlocks.cs" />
-    <Compile Include="MySql.Data\zlib\InfCodes.cs" />
-    <Compile Include="MySql.Data\zlib\Inflate.cs" />
-    <Compile Include="MySql.Data\zlib\InfTree.cs" />
-    <Compile Include="MySql.Data\zlib\StaticTree.cs" />
-    <Compile Include="MySql.Data\zlib\SupportClass.cs" />
-    <Compile Include="MySql.Data\zlib\Tree.cs" />
-    <Compile Include="MySql.Data\zlib\ZInputStream.cs" />
-    <Compile Include="MySql.Data\zlib\Zlib.cs" />
-    <Compile Include="MySql.Data\zlib\ZOutputStream.cs" />
-    <Compile Include="MySql.Data\zlib\ZStream.cs" />
-    <Compile Include="MySql.Data\zlib\ZStreamException.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="MySql.Data\Properties\ReservedWords.txt" />
-    <EmbeddedResource Include="MySql.Data\Properties\Resources.resx">
-      <SubType>Designer</SubType>
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="MySql.Data\Properties\keywords.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="MySql.Data\Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
+    <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)External\DllExport\tools\net.r_eg.DllExport.targets" Condition="Exists('$(SolutionDir)External\DllExport\tools\net.r_eg.DllExport.targets')" Label="8337224c9ad9e356" />
@@ -250,4 +127,13 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\Fody.2.0.0\build\netstandard1.4\Fody.targets" Condition="Exists('..\packages\Fody.2.0.0\build\netstandard1.4\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.2.0.0\build\netstandard1.4\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.0.0\build\netstandard1.4\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets'))" />
+  </Target>
+  <Import Project="..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.1.6.2\build\dotnet\Costura.Fody.targets')" />
 </Project>
