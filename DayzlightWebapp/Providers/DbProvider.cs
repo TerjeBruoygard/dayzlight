@@ -12,7 +12,7 @@ namespace DayzlightWebapp.Providers
     public class DbProvider : DbProviderBase
     {
         private static readonly string dbCredentials_ = File.ReadAllText(
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DB.ini")
+            Path.Combine(System.Web.Hosting.HostingEnvironment.MapPath("~/bin"), "DB.ini")
         );
         
         public DbProvider(bool autoOpen = true)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace DayzlightWebapp.Providers
 {
@@ -38,7 +39,8 @@ namespace DayzlightWebapp.Providers
 
         public override string[] GetRolesForUser(string username)
         {
-            if (username.Equals("admin"))
+            var db = new DbProvider();
+            if (db.Admins.First(x => x.Login.Equals(username)) != null)
             {
                 return new string[] { "Administrator" };
             }
