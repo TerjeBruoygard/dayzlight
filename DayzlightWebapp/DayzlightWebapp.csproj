@@ -382,15 +382,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\DayzlightCommon\Entities\AdminEntity.cs">
-      <Link>Entities\AdminEntity.cs</Link>
-    </Compile>
-    <Compile Include="..\DayzlightCommon\Entities\ServerInfoEntity.cs">
-      <Link>Entities\ServerInfoEntity.cs</Link>
-    </Compile>
-    <Compile Include="..\DayzlightCommon\Providers\DbProviderBase.cs">
-      <Link>Providers\DbProviderBase.cs</Link>
-    </Compile>
     <Compile Include="Models\LivemapModel.cs" />
     <Compile Include="Providers\AuthProvider.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -483,6 +474,12 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DayzlightCommon\DayzlightCommon.csproj">
+      <Project>{1eef85b3-044d-4b61-9300-000000000000}</Project>
+      <Name>DayzlightCommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

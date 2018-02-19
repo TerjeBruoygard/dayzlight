@@ -4,10 +4,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayzlightWebapp", "DayzlightWebapp\DayzlightWebapp.csproj", "{7C42C3BF-5132-45E3-BA34-AD746EC2468C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1EEF85B3-044D-4B61-9300-000000000000} = {1EEF85B3-044D-4B61-9300-000000000000}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayzlightAddon", "DayzlightAddon\DayzlightAddon.csproj", "{DF0B8DB6-8B54-4B54-B1B3-2E9315E75911}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1EEF85B3-044D-4B61-9300-000000000000} = {1EEF85B3-044D-4B61-9300-000000000000}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayzlightAddonTests", "DayzlightAddonTests\DayzlightAddonTests.csproj", "{1EEF85B3-044D-4B61-9347-B916591533D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayzlightCommon", "DayzlightCommon\DayzlightCommon.csproj", "{1EEF85B3-044D-4B61-9300-000000000000}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +56,18 @@ Global
 		{1EEF85B3-044D-4B61-9347-B916591533D6}.Release|x64.ActiveCfg = Release|x86
 		{1EEF85B3-044D-4B61-9347-B916591533D6}.Release|x86.ActiveCfg = Release|x86
 		{1EEF85B3-044D-4B61-9347-B916591533D6}.Release|x86.Build.0 = Release|x86
+		{1EEF85B3-044D-4B61-9300-000000000000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EEF85B3-044D-4B61-9300-000000000000}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EEF85B3-044D-4B61-9300-000000000000}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1EEF85B3-044D-4B61-9300-000000000000}.Debug|x64.Build.0 = Debug|Any CPU
+		{1EEF85B3-044D-4B61-9300-000000000000}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1EEF85B3-044D-4B61-9300-000000000000}.Debug|x86.Build.0 = Debug|Any CPU
+		{1EEF85B3-044D-4B61-9300-000000000000}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EEF85B3-044D-4B61-9300-000000000000}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EEF85B3-044D-4B61-9300-000000000000}.Release|x64.ActiveCfg = Release|Any CPU
+		{1EEF85B3-044D-4B61-9300-000000000000}.Release|x64.Build.0 = Release|Any CPU
+		{1EEF85B3-044D-4B61-9300-000000000000}.Release|x86.ActiveCfg = Release|Any CPU
+		{1EEF85B3-044D-4B61-9300-000000000000}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
