@@ -101,7 +101,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Dayzlight\DB.ini">
+    <None Include="..\DB.ini">
+      <Link>Dayzlight\DB.ini</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Dayzlight\DayzlightAddon.sqf">
