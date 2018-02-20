@@ -158,6 +158,9 @@
                                 );
                                 ctx.closePath();
                                 ctx.fill();
+
+                                ctx.font = (rad * 1.6) + "px Helvetica, Arial, sans-serif";
+                                ctx.fillText(plmov.Uid, x + rad, y - rad);
                             }
                             else {
                                 ctx.beginPath();
