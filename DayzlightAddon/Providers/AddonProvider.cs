@@ -21,7 +21,7 @@ namespace DayzlightAddon.Providers
                     // Clean old records
                     var delDateTime = DateTime.UtcNow.AddDays(-1);
                     db_.PlayerMovements.RemoveRange(
-                        db_.PlayerMovements.Where(x => x.Timepont.TimePoint < delDateTime)
+                        db_.PlayerMovements.Where(x => x.Timepoint.TimePoint < delDateTime)
                     );
                     db_.Timepoints.RemoveRange(
                         db_.Timepoints.Where(x => x.TimePoint < delDateTime)
@@ -66,7 +66,7 @@ namespace DayzlightAddon.Providers
                         movements.Add(new PlayerMovementEntity()
                         {
                             Uid = Int64.Parse(movement[0]),
-                            Timepont = timepoint,
+                            Timepoint = timepoint,
                             PosX = movement[1][0],
                             PosY = movement[1][1],
                             Dir = movement[2]
