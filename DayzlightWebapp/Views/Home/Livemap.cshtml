@@ -13,7 +13,7 @@
     // Fix circular dependencies on serialization
     @foreach (var tp in Model.Timepoints) {
         foreach(var mv in tp.PlayerMovements) {
-            mv.Timepont = null;
+            mv.Timepoint = null;
         }
     }
     var timePoints = @Html.Raw(Json.Encode(Model.Timepoints));

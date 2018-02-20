@@ -13,7 +13,7 @@ namespace DayzlightCommon.Entities
 
         [Index(IsUnique = false)]
         [Required]
-        public TimepointEntity Timepont { set; get; }
+        public TimepointEntity Timepoint { set; get; }
 
         [Index(IsUnique = false)]
         [Required]
