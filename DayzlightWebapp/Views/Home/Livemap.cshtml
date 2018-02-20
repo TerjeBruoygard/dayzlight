@@ -17,8 +17,12 @@
         }
     }
     var timePoints = @Html.Raw(Json.Encode(Model.Timepoints));
-    var currentTimePoint = timePoints[timePoints.length - 1];
+    var currentTimePointId = timePoints.length - 1;
     var updateMap;
+
+    Math.radians = function (degrees) {
+        return degrees * Math.PI / 180;
+    }
 
     function trackTransforms(ctx) {
         var svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -87,7 +91,7 @@
         var mapimg = new Image;
         var mapwidth = @Html.Raw(Model.ServerInfo.MaxCornerX - Model.ServerInfo.MinCornerX);
         var mapheight = @Html.Raw(Model.ServerInfo.MaxCornerY - Model.ServerInfo.MinCornerY);
-        mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerInfo.WorldName + "/satellite.png")';
+        mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerInfo.WorldName + "/map.png")';
         window.addEventListener("load", function () {
             var ctx = canvas.getContext('2d');
             trackTransforms(ctx);
@@ -105,11 +109,63 @@
 
                 ctx.drawImage(mapimg, 0, 0, mapwidth, mapheight);
 
-                ctx.fillStyle = "#ff0000";
-                if (currentTimePoint) {
-                    currentTimePoint.PlayerMovements.forEach(function (plmov) {
-                        ctx.fillRect(plmov.PosX, plmov.PosY, 50, 50);
-                    });
+                var trailSize = 10;
+                ctx.fillStyle = ctx.strokeStyle = "#4c5ca5";
+                if (currentTimePointId >= 0) {
+                    var drawCount = 0;
+                    for (var drawId = currentTimePointId - trailSize < 0 ? 0 : currentTimePointId - trailSize;
+                        drawId <= currentTimePointId; drawId++) {
+                        drawCount++;
+                        timePoints[drawId].PlayerMovements.forEach(function(plmov) {
+                            var rad = (p2.x - Math.max(0, p1.x)) / (canvas.width * 0.15);
+                            var x = plmov.PosX;
+                            var y = mapheight - plmov.PosY;
+                            var dir = plmov.Dir + 180;
+                            var ang = 30;
+                            var linew = Math.min(rad / 2, Math.max(1, (rad / 2)));
+
+                            if (drawId > currentTimePointId - trailSize && timePoints[drawId - 1]) {
+                                var last = timePoints[drawId - 1].PlayerMovements.find(function (x) {
+                                    return x.Uid === plmov.Uid
+                                });
+                                if (last) {
+                                    ctx.lineWidth = linew;
+                                    ctx.beginPath();
+                                    ctx.moveTo(x, y);
+                                    ctx.lineTo(last.PosX, mapheight - last.PosY);
+                                    ctx.stroke();
+                                    ctx.lineWidth = 1;
+                                }
+                            }
+
+                            if (currentTimePointId == drawId) {
+                                ctx.beginPath();
+                                ctx.arc(x, y, rad, 0, 2 * Math.PI);
+                                ctx.fill();
+
+                                ctx.beginPath();
+                                ctx.moveTo(
+                                    x - (Math.sin(Math.radians(dir - ang)) * rad),
+                                    y + (Math.cos(Math.radians(dir - ang)) * rad)
+                                );
+                                ctx.lineTo(
+                                    x - (Math.sin(Math.radians(dir)) * (rad * 1.4)),
+                                    y + (Math.cos(Math.radians(dir)) * (rad * 1.4))
+                                );
+                                ctx.lineTo(
+                                    x - (Math.sin(Math.radians(dir + ang)) * rad),
+                                    y + (Math.cos(Math.radians(dir + ang)) * rad)
+                                );
+                                ctx.closePath();
+                                ctx.fill();
+                            }
+                            else {
+                                ctx.beginPath();
+                                ctx.arc(x, y, linew * 0.75, 0, 2 * Math.PI);
+                                ctx.fill();
+                            }
+                        });
+                    }
                 }
             }
 
@@ -123,11 +179,6 @@
                 redraw();
             }, false);
 
-            processResize();
-            redraw();
-
-            var dragStart;
-            var lastX = mapwidth / 2, lastY = mapheight / 2;
             var fixTranlation = function () {
                 var fixmin = ctx.transformedPoint(0, 0);
                 if (fixmin.x < 0) {
@@ -146,6 +197,14 @@
                     ctx.translate(0, (fixmax.y - mapheight));
                 }
             }
+
+            processResize();
+            var dragStart;
+            var lastX = canvas.width / 2, lastY = canvas.height / 2;
+            ctx.translate(-(mapwidth / 2), -(mapheight / 2));
+            ctx.scale(0.25, 0.25);
+            fixTranlation();
+            redraw();
 
             canvas.addEventListener('mousedown', function (evt) {
                 document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
@@ -178,8 +237,8 @@
 
                 var needScale = false;
                 if (factor > 1) {
-                    if (max.x - Math.max(0, min.x) > 500 &&
-                        max.y - Math.max(0, min.y) > 500) {
+                    if (max.x - Math.max(0, min.x) > 1000 &&
+                        max.y - Math.max(0, min.y) > 1000) {
                         needScale = true;
                     }
                 }
@@ -249,23 +308,24 @@
                 // Draw carret
                 var carret = ctx.transformedPoint(canvas.width / 2, 0);
                 var pointId = Math.floor(carret.x / step);
-                var newTimePoint = pointId < 0
-                    ? timePoints[0]
+                var newTimePointId = pointId < 0
+                    ? 0
                     : timePoints[pointId]
-                        ? timePoints[pointId]
-                        : timePoints[timePoints.length - 1];
+                        ? pointId
+                        : timePoints.length - 1;
 
-                if (newTimePoint != currentTimePoint) {
-                    currentTimePoint = newTimePoint;
+                if (newTimePointId != currentTimePointId) {
+                    currentTimePointId = newTimePointId;
                     updateMap();
                 }
 
                 ctx.fillStyle = "#D62727";
                 ctx.font = "12px Helvetica, Arial, sans-serif";
                 ctx.fillRect(carret.x, 0, 2, canvas.height);
-                if (currentTimePoint) {
-                    var date = new Date(parseInt(currentTimePoint.TimePoint.substr(6)));
-                    ctx.fillText(date.toLocaleTimeString(), carret.x + 4, 14);
+                if (currentTimePointId >= 0) {
+                    var date = new Date(parseInt(timePoints[currentTimePointId].TimePoint.substr(6)));
+                    var date_utc = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
+                    ctx.fillText(date_utc.toLocaleTimeString(), carret.x + 4, 14);
                 }
             }
 
@@ -304,7 +364,7 @@
                 dragStart = null;
             }, false);
 
-            var scaleFactor = -2.2;
+            var scaleFactor = -10;
             var zoom = function (clicks) {
                 var pt = ctx.transformedPoint(lastX, 0);
                 var factor = clicks * scaleFactor;

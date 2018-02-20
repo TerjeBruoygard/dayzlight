@@ -21,7 +21,7 @@ if (_result == "OK") then {
 		_tStart = diag_tickTime;
 		_plmov = [];
 		{
-			_plmov set [count _plmov, [getPlayerUID _x, getPos _x, getDir _x]];
+			_plmov set [count _plmov, [getPlayerUID _x, getPos vehicle _x, getDir vehicle _x]];
 			uiSleep 0.1;
 		} forEach playableUnits;
 
