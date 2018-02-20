@@ -1,134 +1,25 @@
 ﻿@model DayzlightWebapp.Models.LivemapModel
+@{
+    System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+}
 
 <div id="map-div" class="div-map">
     <canvas id="map-canvas"></canvas>
 </div>
+<div id="timeline-div" class="div-timeline">
+    <canvas id="timeline-canvas"></canvas>
+</div>
 <script>
-    var canvas = document.getElementById("map-canvas");
-    var mapimg = new Image;
-    var mapwidth = @Html.Raw(Model.ServerInfo.MaxCornerX - Model.ServerInfo.MinCornerX);
-    var mapheight = @Html.Raw(Model.ServerInfo.MaxCornerY - Model.ServerInfo.MinCornerY);
-    window.onload = function () {
-        var ctx = canvas.getContext('2d');
-        trackTransforms(ctx);
-
-        var redraw = function() {
-            // Clear the entire canvas
-            var p1 = ctx.transformedPoint(0, 0);
-            var p2 = ctx.transformedPoint(canvas.width, canvas.height);
-            ctx.clearRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
-
-            ctx.save();
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.restore();
-
-            ctx.drawImage(mapimg, 0, 0, mapwidth, mapheight);
-
+    // Fix circular dependencies on serialization
+    @foreach (var tp in Model.Timepoints) {
+        foreach(var mv in tp.PlayerMovements) {
+            mv.Timepont = null;
         }
+    }
+    var timePoints = @Html.Raw(Json.Encode(Model.Timepoints));
+    var currentTimePoint = timePoints[timePoints.length - 1];
+    var updateMap;
 
-        var processResize = function () {
-            canvas.width = $("#map-div").innerWidth();
-            canvas.height = $("#map-div").innerHeight();
-            redraw();
-        }
-
-        window.onresize = function () {
-            processResize();
-        }
-
-        processResize();
-
-        var lastX = canvas.width / 2, lastY = canvas.height / 2;
-        var dragStart, dragged;
-
-        var fixTranlation = function () {
-            var fixmin = ctx.transformedPoint(0, 0);
-            if (fixmin.x < 0) {
-                ctx.translate(fixmin.x, 0);
-            }
-            if (fixmin.y < 0) {
-                ctx.translate(0, fixmin.y);
-            }
-
-            var fixmax = ctx.transformedPoint(canvas.width, canvas.height);
-            if (fixmax.x > mapwidth) {
-                ctx.translate((fixmax.x - mapwidth), 0);
-            }
-
-            if (fixmax.y > mapheight) {
-                ctx.translate(0, (fixmax.y - mapheight));
-            }
-        }
-
-        canvas.addEventListener('mousedown', function (evt) {
-            document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
-            lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
-            lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-            dragStart = ctx.transformedPoint(lastX, lastY);
-            dragged = false;
-        }, false);
-
-        canvas.addEventListener('mousemove', function (evt) {
-            lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
-            lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-            dragged = true;
-            if (dragStart) {
-                var pt = ctx.transformedPoint(lastX, lastY);
-                ctx.translate(pt.x - dragStart.x, pt.y - dragStart.y);
-                fixTranlation();
-                redraw();
-            }
-        }, false);
-
-        canvas.addEventListener('mouseup', function (evt) {
-            dragStart = null;
-            if (!dragged) zoom(evt.shiftKey ? -1 : 1);
-        }, false);
-
-        var scaleFactor = 1.05;
-
-        var zoom = function (clicks) {
-            var pt = ctx.transformedPoint(lastX, lastY);
-            var min = ctx.transformedPoint(0, 0);
-            var max = ctx.transformedPoint(canvas.width, canvas.height);  
-            var factor = Math.pow(scaleFactor, clicks);
-
-            var needScale = false;
-            if (factor > 1) {
-                if (max.x - Math.max(0, min.x) > 500 &&
-                    max.y - Math.max(0, min.y) > 500) {
-                    needScale = true;
-                }
-            }
-            else if (factor < 1) {
-                if ((max.x - Math.max(0, min.x)) / factor < mapwidth &&
-                    (max.y - Math.max(0, min.y)) / factor < mapheight) {
-                    needScale = true;
-                }
-            }
-
-            if (needScale) {
-                ctx.translate(pt.x, pt.y);
-                ctx.scale(factor, factor);
-                ctx.translate(-pt.x, -pt.y);
-            }
-
-            fixTranlation();
-            redraw();
-        }
-
-        var handleScroll = function (evt) {
-            var delta = evt.wheelDelta ? evt.wheelDelta / 40 : evt.detail ? -evt.detail : 0;
-            if (delta) zoom(delta);
-            return evt.preventDefault() && false;
-        };
-
-        canvas.addEventListener('DOMMouseScroll', handleScroll, false);
-        canvas.addEventListener('mousewheel', handleScroll, false);
-    };
-
-    mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerInfo.WorldName + "/satellite.png")';
     function trackTransforms(ctx) {
         var svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         var xform = svg.createSVGMatrix();
@@ -189,5 +80,249 @@
             pt.x = x; pt.y = y;
             return pt.matrixTransform(xform.inverse());
         }
-    }
+    };
+
+    function mapProcessing() {
+        var canvas = document.getElementById("map-canvas");
+        var mapimg = new Image;
+        var mapwidth = @Html.Raw(Model.ServerInfo.MaxCornerX - Model.ServerInfo.MinCornerX);
+        var mapheight = @Html.Raw(Model.ServerInfo.MaxCornerY - Model.ServerInfo.MinCornerY);
+        mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerInfo.WorldName + "/satellite.png")';
+        window.addEventListener("load", function () {
+            var ctx = canvas.getContext('2d');
+            trackTransforms(ctx);
+
+            var redraw = updateMap = function () {
+                // Clear the entire canvas
+                var p1 = ctx.transformedPoint(0, 0);
+                var p2 = ctx.transformedPoint(canvas.width, canvas.height);
+                ctx.clearRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+
+                ctx.drawImage(mapimg, 0, 0, mapwidth, mapheight);
+
+                ctx.fillStyle = "#ff0000";
+                if (currentTimePoint) {
+                    currentTimePoint.PlayerMovements.forEach(function (plmov) {
+                        ctx.fillRect(plmov.PosX, plmov.PosY, 50, 50);
+                    });
+                }
+            }
+
+            var processResize = function () {
+                canvas.width = $("#map-div").innerWidth();
+                canvas.height = $("#map-div").innerHeight();
+            }
+
+            canvas.addEventListener('resize', function () {
+                processResize();
+                redraw();
+            }, false);
+
+            processResize();
+            redraw();
+
+            var dragStart;
+            var lastX = mapwidth / 2, lastY = mapheight / 2;
+            var fixTranlation = function () {
+                var fixmin = ctx.transformedPoint(0, 0);
+                if (fixmin.x < 0) {
+                    ctx.translate(fixmin.x, 0);
+                }
+                if (fixmin.y < 0) {
+                    ctx.translate(0, fixmin.y);
+                }
+
+                var fixmax = ctx.transformedPoint(canvas.width, canvas.height);
+                if (fixmax.x > mapwidth) {
+                    ctx.translate((fixmax.x - mapwidth), 0);
+                }
+
+                if (fixmax.y > mapheight) {
+                    ctx.translate(0, (fixmax.y - mapheight));
+                }
+            }
+
+            canvas.addEventListener('mousedown', function (evt) {
+                document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
+                lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+                lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+                dragStart = ctx.transformedPoint(lastX, lastY);
+            }, false);
+
+            canvas.addEventListener('mousemove', function (evt) {
+                lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+                lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+                if (dragStart) {
+                    var pt = ctx.transformedPoint(lastX, lastY);
+                    ctx.translate(pt.x - dragStart.x, pt.y - dragStart.y);
+                    fixTranlation();
+                    redraw();
+                }
+            }, false);
+
+            canvas.addEventListener('mouseup', function (evt) {
+                dragStart = null;
+            }, false);
+
+            var scaleFactor = 1.05;
+            var zoom = function (clicks) {
+                var pt = ctx.transformedPoint(lastX, lastY);
+                var min = ctx.transformedPoint(0, 0);
+                var max = ctx.transformedPoint(canvas.width, canvas.height);
+                var factor = Math.pow(scaleFactor, clicks);
+
+                var needScale = false;
+                if (factor > 1) {
+                    if (max.x - Math.max(0, min.x) > 500 &&
+                        max.y - Math.max(0, min.y) > 500) {
+                        needScale = true;
+                    }
+                }
+                else if (factor < 1) {
+                    if ((max.x - Math.max(0, min.x)) / factor < mapwidth &&
+                        (max.y - Math.max(0, min.y)) / factor < mapheight) {
+                        needScale = true;
+                    }
+                }
+
+                if (needScale) {
+                    ctx.translate(pt.x, pt.y);
+                    ctx.scale(factor, factor);
+                    ctx.translate(-pt.x, -pt.y);
+                }
+
+                fixTranlation();
+                redraw();
+            }
+
+            var handleScroll = function (evt) {
+                var delta = evt.wheelDelta ? evt.wheelDelta / 40 : evt.detail ? -evt.detail : 0;
+                if (delta) zoom(delta);
+                return evt.preventDefault() && false;
+            };
+
+            canvas.addEventListener('DOMMouseScroll', handleScroll, false);
+            canvas.addEventListener('mousewheel', handleScroll, false);
+        }, false);
+    };
+
+    function timelineProcessing() {
+        var step = 10;
+        var canvas = document.getElementById("timeline-canvas");
+        window.addEventListener("load", function () {
+            var ctx = canvas.getContext('2d');
+            trackTransforms(ctx);
+
+            var redraw = function () {
+                // Clear the entire canvas
+                var p1 = ctx.transformedPoint(0, 0);
+                var p2 = ctx.transformedPoint(canvas.width, canvas.height);
+                ctx.clearRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.fillStyle = $(".navbar").css("background-color");
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+
+                // Draw timeline
+                ctx.fillStyle = "#2C6330";
+                var i = 0;
+                timePoints.forEach(function (tp) {
+                    var divider = 1.1;
+                    if (i % 5 == 0) { divider = 1.4; }
+                    if (i % 10 == 0) { divider = 1.8; }
+                    if (i == timePoints.length - 1) {
+                        divider = 1.8;
+                        ctx.fillStyle = "#2C6330";
+                    }
+                    ctx.fillRect(i * step, canvas.height / divider, 1, canvas.height);
+                    ctx.fillStyle = "#999999";
+                    i++;
+                });
+
+                // Draw carret
+                var carret = ctx.transformedPoint(canvas.width / 2, 0);
+                var pointId = Math.floor(carret.x / step);
+                var newTimePoint = pointId < 0
+                    ? timePoints[0]
+                    : timePoints[pointId]
+                        ? timePoints[pointId]
+                        : timePoints[timePoints.length - 1];
+
+                if (newTimePoint != currentTimePoint) {
+                    currentTimePoint = newTimePoint;
+                    updateMap();
+                }
+
+                ctx.fillStyle = "#D62727";
+                ctx.font = "12px Helvetica, Arial, sans-serif";
+                ctx.fillRect(carret.x, 0, 2, canvas.height);
+                if (currentTimePoint) {
+                    var date = new Date(parseInt(currentTimePoint.TimePoint.substr(6)));
+                    ctx.fillText(date.toLocaleTimeString(), carret.x + 4, 14);
+                }
+            }
+
+            var processResize = function () {
+                canvas.width = $("#timeline-div").innerWidth();
+                canvas.height = $("#timeline-div").innerHeight();
+            }
+
+            canvas.addEventListener('resize', function () {
+                processResize();
+                redraw();
+            }, false);
+            
+            processResize();
+            ctx.translate((canvas.width / 2) - ((timePoints.length - 1) * 10), 0);
+            redraw();
+
+            var dragStart;
+            var lastX = 0;
+            canvas.addEventListener('mousedown', function (evt) {
+                document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
+                lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+                dragStart = ctx.transformedPoint(lastX, 0);
+            }, false);
+
+            canvas.addEventListener('mousemove', function (evt) {
+                lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+                if (dragStart) {
+                    var pt = ctx.transformedPoint(lastX, 0);
+                    ctx.translate(pt.x - dragStart.x, 0);
+                    redraw();
+                }
+            }, false);
+
+            canvas.addEventListener('mouseup', function (evt) {
+                dragStart = null;
+            }, false);
+
+            var scaleFactor = -2.2;
+            var zoom = function (clicks) {
+                var pt = ctx.transformedPoint(lastX, 0);
+                var factor = clicks * scaleFactor;
+                ctx.translate(factor, 0);
+                redraw();
+            }
+
+            var handleScroll = function (evt) {
+                var delta = evt.wheelDelta ? evt.wheelDelta / 40 : evt.detail ? -evt.detail : 0;
+                if (delta) zoom(delta);
+                return evt.preventDefault() && false;
+            };
+
+            canvas.addEventListener('DOMMouseScroll', handleScroll, false);
+            canvas.addEventListener('mousewheel', handleScroll, false);
+        }, false);
+    };
+
+    timelineProcessing();
+    mapProcessing();
 </script>

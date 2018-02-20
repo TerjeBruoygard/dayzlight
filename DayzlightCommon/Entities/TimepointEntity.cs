@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,5 +15,7 @@ namespace DayzlightCommon.Entities
         [Index(IsUnique = true)]
         [Required]
         public DateTime TimePoint { set; get; }
+
+        public ICollection<PlayerMovementEntity> PlayerMovements { get; set; }
     }
 }

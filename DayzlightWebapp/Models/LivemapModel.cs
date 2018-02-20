@@ -8,5 +8,6 @@ namespace DayzlightWebapp.Models
     public class LivemapModel
     {
         public ServerInfoEntity ServerInfo;
+        public TimepointEntity[] Timepoints;
     }
 }
