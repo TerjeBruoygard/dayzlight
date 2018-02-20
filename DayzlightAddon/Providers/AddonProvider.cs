@@ -18,6 +18,16 @@ namespace DayzlightAddon.Providers
             {
                 try
                 {
+                    // Clean old records
+                    var delDateTime = DateTime.UtcNow.AddDays(-1);
+                    db_.PlayerMovements.RemoveRange(
+                        db_.PlayerMovements.Where(x => x.Timepont.TimePoint < delDateTime)
+                    );
+                    db_.Timepoints.RemoveRange(
+                        db_.Timepoints.Where(x => x.TimePoint < delDateTime)
+                    );
+
+                    // Update server info
                     db_.ServerInfo.AddOrUpdate(new ServerInfoEntity() {
                         Id = 1,
                         WorldName = a2arr[1],

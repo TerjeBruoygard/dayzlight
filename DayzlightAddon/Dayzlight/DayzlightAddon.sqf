@@ -1,6 +1,6 @@
 ﻿if (!isDedicated) exitWith {};
 diag_log format["[DAYZLIGHT] Start initializing..."];
-DAYZLIGHT_DB_CREDENTIALS = loadFile "DB.ini";
+DAYZLIGHT_DB_CREDENTIALS = loadFile "\Dayzlight\DB.ini";
 DAYZLIGHT_DLLNAME = "DayzlightAddon";
 DAYZLIGHT_EXTFNC_INIT = "INIT";
 DAYZLIGHT_EXTFNC_STAT = "STAT";
