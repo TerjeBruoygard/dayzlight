@@ -33,6 +33,11 @@
     ];
     var currentTimePointId = timePoints.length - 1;
     var updateMap;
+    var pathLength = 10;
+    var hideSpawnTp = true;
+    var clearPathAfterDisconnect = true;
+    var iconsOverlayColor = "#666666cc";
+    var iconsSize = 1;
 
     Math.radians = function (degrees) {
         return degrees * Math.PI / 180;
@@ -98,7 +103,7 @@
             pt.x = x; pt.y = y;
             return pt.matrixTransform(xform.inverse());
         }
-    };
+    }
 
     function mapProcessing() {
         var canvas = document.getElementById("map-canvas");
@@ -110,8 +115,143 @@
             var ctx = canvas.getContext('2d');
             trackTransforms(ctx);
 
+            // Draw player
+            var drawPlayerIcon = function (x, y, rad, ang, dir, sizeMod, color) {
+                ctx.fillStyle = ctx.strokeStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, y, rad * sizeMod, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(
+                    x - (Math.sin(Math.radians(dir - ang)) * (rad * sizeMod)),
+                    y + (Math.cos(Math.radians(dir - ang)) * (rad * sizeMod))
+                );
+                ctx.lineTo(
+                    x - (Math.sin(Math.radians(dir)) * (rad * sizeMod * 1.6)),
+                    y + (Math.cos(Math.radians(dir)) * (rad * sizeMod * 1.6))
+                );
+                ctx.lineTo(
+                    x - (Math.sin(Math.radians(dir + ang)) * (rad * sizeMod)),
+                    y + (Math.cos(Math.radians(dir + ang)) * (rad * sizeMod))
+                );
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            var drawPlayerName = function (x, y, rad, color, nameColor, nameText) {
+                var textHeight = rad * 1.8;
+                var textOffset = rad * 2;
+                ctx.font = textHeight + "px bold Helvetica, Arial, sans-serif";
+
+                var width = ctx.measureText(nameText).width;
+                var offset = rad / 4;
+                ctx.fillStyle = color;
+                ctx.fillRect(x + textOffset - offset, y - textOffset - textHeight, width + (2 * offset), textHeight + (2 * offset));
+
+                ctx.fillStyle = nameColor;
+                ctx.fillText(nameText, x + textOffset, y - textOffset);
+            }
+
+            // Draw path for player
+            var drawPlayerPath = function (x1, y1, x2, y2, width, color) {
+                ctx.fillStyle = ctx.strokeStyle = color;
+                ctx.lineWidth = width;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(x2, y2, width * 0.5, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            var drawAllPlayers = function (p1, p2, isOverlay) {
+                if (currentTimePointId >= 0) {
+                    var rad = ((p2.x - Math.max(0, p1.x)) / (canvas.width * 0.15)) * iconsSize;
+                    var ang = 45;
+                    var sizeMod = isOverlay ? 1.4 : 1;
+                    var linew = Math.min(rad / 2, Math.max(1, (rad / 2)));
+                    var playerHeads = [];
+
+                    if (isOverlay) {
+                        linew += ((rad * sizeMod) - rad) * 2;
+                    }
+                    
+                    for (var drawId = currentTimePointId - pathLength >= 0 ? currentTimePointId - pathLength : 0;
+                        drawId <= currentTimePointId; drawId++) {
+                        timePoints[drawId].PlayerMovements.forEach(function (plmov) {
+                            // Check if need to draw
+                            var skip = false;
+
+                            // Check by disconnect
+                            skip |= clearPathAfterDisconnect && !timePoints[currentTimePointId].PlayerMovements.find(function (x) {
+                                return x.Uid === plmov.Uid
+                            });
+
+                            // Check by distance from spawn
+                            skip |= hideSpawnTp && Math.sqrt(
+                                Math.pow(plmov.PosX - @Html.Raw(Model.ServerInfo.SpawnPointX), 2) +
+                                Math.pow(plmov.PosY - @Html.Raw(Model.ServerInfo.SpawnPointY), 2)
+                            ) < 100;
+
+                            if (!skip) {
+                                // Calculate path
+                                var last = null;
+                                var fillColor = isOverlay ? iconsOverlayColor : plmov.Color;
+                                if (pathLength > 0 && drawId > 0 && timePoints[drawId - 1]) {
+                                    var lastCandidate = timePoints[drawId - 1].PlayerMovements.find(function (x) {
+                                        return x.Uid === plmov.Uid
+                                    });
+
+                                    if (lastCandidate && (!hideSpawnTp || Math.sqrt(
+                                        Math.pow(lastCandidate.PosX - @Html.Raw(Model.ServerInfo.SpawnPointX), 2) +
+                                        Math.pow(lastCandidate.PosY - @Html.Raw(Model.ServerInfo.SpawnPointY), 2)
+                                    ) >= 100)) {
+                                        last = lastCandidate;
+                                    }
+                                }
+
+                                // Draw body and path
+                                if (last) {
+                                    drawPlayerPath(plmov.PosX, mapheight - plmov.PosY, last.PosX, mapheight - last.PosY, linew, fillColor);
+                                }
+                                if (currentTimePointId == drawId) {
+                                    if (isOverlay) {
+                                        drawPlayerIcon(plmov.PosX, mapheight - plmov.PosY, rad, ang, plmov.Dir + 180, sizeMod, fillColor);
+                                    }
+                                    else {
+                                        playerHeads.push({
+                                            x: plmov.PosX,
+                                            y: mapheight - plmov.PosY,
+                                            dir: plmov.Dir + 180,
+                                            color: plmov.Color,
+                                            name: plmov.Name
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    if (!isOverlay) {
+                        // Draw heads
+                        playerHeads.forEach(function(i) {
+                            drawPlayerIcon(i.x, i.y, rad, ang, i.dir, sizeMod, i.color);
+                        });
+
+                        // Draw names
+                        playerHeads.forEach(function (i) {
+                            drawPlayerName(i.x, i.y, rad, iconsOverlayColor, i.color, i.name);
+                        });
+                    }
+                }
+            }
+
+            // Redraw all canvas
             var redraw = updateMap = function () {
-                // Clear the entire canvas
+                // Clear canvas
                 var p1 = ctx.transformedPoint(0, 0);
                 var p2 = ctx.transformedPoint(canvas.width, canvas.height);
                 ctx.clearRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
@@ -121,70 +261,12 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.restore();
 
+                // Draw map
                 ctx.drawImage(mapimg, 0, 0, mapwidth, mapheight);
 
-                var trailSize = 10;
-                if (currentTimePointId >= 0) {
-                    var drawCount = 0;
-                    for (var drawId = currentTimePointId - trailSize < 0 ? 0 : currentTimePointId - trailSize;
-                        drawId <= currentTimePointId; drawId++) {
-                        drawCount++;
-                        timePoints[drawId].PlayerMovements.forEach(function(plmov) {
-                            var rad = (p2.x - Math.max(0, p1.x)) / (canvas.width * 0.15);
-                            var x = plmov.PosX;
-                            var y = mapheight - plmov.PosY;
-                            var dir = plmov.Dir + 180;
-                            var ang = 30;
-                            var linew = Math.min(rad / 2, Math.max(1, (rad / 2)));
-
-                            ctx.fillStyle = ctx.strokeStyle = plmov.Color;
-                            if (drawId > currentTimePointId - trailSize && timePoints[drawId - 1]) {
-                                var last = timePoints[drawId - 1].PlayerMovements.find(function (x) {
-                                    return x.Uid === plmov.Uid
-                                });
-                                
-                                if (last) {
-                                    ctx.lineWidth = linew;
-                                    ctx.beginPath();
-                                    ctx.moveTo(x, y);
-                                    ctx.lineTo(last.PosX, mapheight - last.PosY);
-                                    ctx.stroke();
-                                    ctx.lineWidth = 1;
-                                }
-                            }
-
-                            if (currentTimePointId == drawId) {
-                                ctx.beginPath();
-                                ctx.arc(x, y, rad, 0, 2 * Math.PI);
-                                ctx.fill();
-
-                                ctx.beginPath();
-                                ctx.moveTo(
-                                    x - (Math.sin(Math.radians(dir - ang)) * rad),
-                                    y + (Math.cos(Math.radians(dir - ang)) * rad)
-                                );
-                                ctx.lineTo(
-                                    x - (Math.sin(Math.radians(dir)) * (rad * 1.4)),
-                                    y + (Math.cos(Math.radians(dir)) * (rad * 1.4))
-                                );
-                                ctx.lineTo(
-                                    x - (Math.sin(Math.radians(dir + ang)) * rad),
-                                    y + (Math.cos(Math.radians(dir + ang)) * rad)
-                                );
-                                ctx.closePath();
-                                ctx.fill();
-
-                                ctx.font = (rad * 1.6) + "px Helvetica, Arial, sans-serif";
-                                ctx.fillText(plmov.Name, x + rad, y - rad);
-                            }
-                            else {
-                                ctx.beginPath();
-                                ctx.arc(x, y, linew * 0.75, 0, 2 * Math.PI);
-                                ctx.fill();
-                            }
-                        });
-                    }
-                }
+                // Draw players
+                drawAllPlayers(p1, p2, true);
+                drawAllPlayers(p1, p2, false);
             }
 
             var processResize = function () {
