@@ -6,8 +6,18 @@
 <div id="map-div" class="div-map">
     <canvas id="map-canvas"></canvas>
 </div>
+<div id="timeline-left-div" class="div-left-timeline">
+    <button class="invis-button" type="submit">
+        <span class="glyphicon glyphicon-backward span-invis-button"></span>
+    </button>
+</div>
 <div id="timeline-div" class="div-timeline">
     <canvas id="timeline-canvas"></canvas>
+</div>
+<div id="timeline-right-div" class="div-right-timeline">
+    <button class="invis-button" type="submit">
+        <span class="glyphicon glyphicon-forward span-invis-button"></span>
+    </button>
 </div>
 <script>
     var timePoints = [
@@ -36,8 +46,13 @@
     var pathLength = 10;
     var hideSpawnTp = true;
     var clearPathAfterDisconnect = true;
-    var iconsOverlayColor = "#666666cc";
+    var iconsOverlayColor = "#666666aa";
     var iconsSize = 1;
+
+    Math.utc = function(dt) {
+        var date = new Date(Date.parse(dt));
+        return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
+    }
 
     Math.radians = function (degrees) {
         return degrees * Math.PI / 180;
@@ -112,9 +127,7 @@
         var mapheight = @Html.Raw(Model.ServerInfo.MaxCornerY - Model.ServerInfo.MinCornerY);
         mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerInfo.WorldName + "/map.png")';
         window.addEventListener("load", function () {
-            var ctx = canvas.getContext('2d');
-            trackTransforms(ctx);
-
+            var ctx = null;
             // Draw player
             var drawPlayerIcon = function (x, y, rad, ang, dir, sizeMod, color) {
                 ctx.fillStyle = ctx.strokeStyle = color;
@@ -274,10 +287,33 @@
                 canvas.height = $("#map-div").innerHeight();
             }
 
-            canvas.addEventListener('resize', function () {
+            var resize = function (first) {
+                var matrix;
+                if (!first) {
+                    matrix = ctx.getTransform();
+                }
+
                 processResize();
+                ctx = canvas.getContext('2d');
+                trackTransforms(ctx);
+
+                if (first) {
+                    ctx.scale(0.25, 0.25);
+                }
+                else {
+                    ctx.setTransform(
+                        matrix.a,
+                        matrix.b,
+                        matrix.c,
+                        matrix.d,
+                        matrix.e,
+                        matrix.f
+                    );
+                }
+
+                fixTranlation();
                 redraw();
-            }, false);
+            };
 
             var fixTranlation = function () {
                 var fixmin = ctx.transformedPoint(0, 0);
@@ -298,13 +334,9 @@
                 }
             }
 
-            processResize();
-            var dragStart;
+            var dragStart = null;
             var lastX = canvas.width / 2, lastY = canvas.height / 2;
-            ctx.translate(-(mapwidth / 2), -(mapheight / 2));
-            ctx.scale(0.25, 0.25);
-            fixTranlation();
-            redraw();
+            resize(true);
 
             canvas.addEventListener('mousedown', function (evt) {
                 document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
@@ -325,6 +357,10 @@
             }, false);
 
             canvas.addEventListener('mouseup', function (evt) {
+                dragStart = null;
+            }, false);
+
+            canvas.addEventListener('mouseleave', function () {
                 dragStart = null;
             }, false);
 
@@ -367,6 +403,7 @@
 
             canvas.addEventListener('DOMMouseScroll', handleScroll, false);
             canvas.addEventListener('mousewheel', handleScroll, false);
+            window.addEventListener('resize', function () { resize(false); }, false);
         }, false);
     };
 
@@ -374,9 +411,7 @@
         var step = 10;
         var canvas = document.getElementById("timeline-canvas");
         window.addEventListener("load", function () {
-            var ctx = canvas.getContext('2d');
-            trackTransforms(ctx);
-
+            var ctx = null;
             var redraw = function () {
                 // Clear the entire canvas
                 var p1 = ctx.transformedPoint(0, 0);
@@ -385,7 +420,7 @@
 
                 ctx.save();
                 ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.fillStyle = $(".navbar").css("background-color");
+                ctx.fillStyle = "#222222";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.restore();
 
@@ -423,9 +458,10 @@
                 ctx.font = "12px Helvetica, Arial, sans-serif";
                 ctx.fillRect(carret.x, 0, 2, canvas.height);
                 if (currentTimePointId >= 0) {
-                    var date = new Date(Date.parse(timePoints[currentTimePointId].TimePoint));
-                    var date_utc = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
-                    ctx.fillText(date_utc.toLocaleTimeString(), carret.x + 4, 14);
+                    var date_utc = Math.utc(timePoints[currentTimePointId].TimePoint);
+                    var date_width = ctx.measureText(date_utc.toLocaleDateString()).width;
+                    ctx.fillText(date_utc.toLocaleTimeString(), carret.x + 6, 14);
+                    ctx.fillText(date_utc.toLocaleDateString(), carret.x - 4 - date_width, 14);
                 }
             }
 
@@ -434,14 +470,26 @@
                 canvas.height = $("#timeline-div").innerHeight();
             }
 
-            canvas.addEventListener('resize', function () {
+            var resize = function () {
                 processResize();
+                ctx = canvas.getContext('2d');
+                trackTransforms(ctx);
+                ctx.translate((canvas.width / 2) - ((timePoints.length - 1) * step), 0);
                 redraw();
-            }, false);
+            }
 
-            processResize();
-            ctx.translate((canvas.width / 2) - ((timePoints.length - 1) * 10), 0);
-            redraw();
+            var fixBounds = function () {
+                var pt = ctx.transformedPoint(canvas.width / 2, 0);
+                var maxBound = (timePoints.length - 1) * step;
+                if (pt.x < 0) {
+                    ctx.translate(pt.x, 0);
+                }
+                else if (pt.x > maxBound) {
+                    ctx.translate(pt.x - maxBound, 0);
+                }
+            }
+
+            resize();
 
             var dragStart;
             var lastX = 0;
@@ -456,6 +504,7 @@
                 if (dragStart) {
                     var pt = ctx.transformedPoint(lastX, 0);
                     ctx.translate(pt.x - dragStart.x, 0);
+                    fixBounds();
                     redraw();
                 }
             }, false);
@@ -464,22 +513,25 @@
                 dragStart = null;
             }, false);
 
-            var scaleFactor = 25;
-            var zoom = function (clicks) {
-                var pt = ctx.transformedPoint(lastX, 0);
-                var factor = clicks * scaleFactor;
-                ctx.translate(factor, 0);
+            canvas.addEventListener('mouseleave', function () {
+                dragStart = null;
+            }, false);
+            
+            var move = function (clicks) {
+                ctx.translate(clicks * -step, 0);
+                fixBounds();
                 redraw();
             }
 
             var handleScroll = function (evt) {
                 var delta = evt.wheelDelta ? evt.wheelDelta / 40 : evt.detail ? -evt.detail : 0;
-                if (delta) zoom(delta);
+                if (delta) move(delta);
                 return evt.preventDefault() && false;
             };
 
             canvas.addEventListener('DOMMouseScroll', handleScroll, false);
             canvas.addEventListener('mousewheel', handleScroll, false);
+            window.addEventListener('resize', resize, false);
         }, false);
     };
 
