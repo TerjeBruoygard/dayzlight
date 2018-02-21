@@ -15,6 +15,8 @@ namespace DayzlightCommon.Providers
         public DbSet<AdminEntity> Admins { get; set; }
         public DbSet<TimepointEntity> Timepoints { get; set; }
         public DbSet<PlayerMovementEntity> PlayerMovements { get; set; }
+        public DbSet<PlayerInfoEntity> Players { get; set; }
+        public DbSet<PlayerNameEntity> PlayerNames { get; set; }
 
         public DbProviderBase()
           : base() { }
@@ -29,6 +31,8 @@ namespace DayzlightCommon.Providers
             modelBuilder.Entity<AdminEntity>();
             modelBuilder.Entity<TimepointEntity>();
             modelBuilder.Entity<PlayerMovementEntity>();
+            modelBuilder.Entity<PlayerInfoEntity>();
+            modelBuilder.Entity<PlayerNameEntity>();
         }
 
         public void Open()

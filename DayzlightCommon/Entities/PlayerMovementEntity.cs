@@ -17,7 +17,7 @@ namespace DayzlightCommon.Entities
 
         [Index(IsUnique = false)]
         [Required]
-        public Int64 Uid { set; get; }
+        public PlayerNameEntity PlayerName { set; get; }
         
         [Required]
         public Double PosX { set; get; }

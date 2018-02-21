@@ -21,7 +21,7 @@ if (_result == "OK") then {
 		_tStart = diag_tickTime;
 		_plmov = [];
 		{
-			_plmov set [count _plmov, [getPlayerUID _x, getPos vehicle _x, getDir vehicle _x]];
+			_plmov set [count _plmov, [getPlayerUID _x, name _x, getPos vehicle _x, getDir vehicle _x]];
 		} forEach playableUnits;
 
 		_result = DAYZLIGHT_DLLNAME callExtension str [DAYZLIGHT_EXTFNC_STAT, [_plmov]];

@@ -22,15 +22,17 @@ namespace DayzlightWebapp.Controllers
             {
                 var timeStart = DateTime.Now.Date;
                 var timeEnd = DateTime.Now.Date.AddDays(1);
-                return View(new LivemapModel()
+
+                var result = new LivemapModel()
                 {
                     ServerInfo = db.ServerInfo.FirstOrDefault(),
                     Timepoints = db.Timepoints.Include(
-                        x => x.PlayerMovements
+                        x => x.PlayerMovements.Select(y => y.PlayerName.PlayerInfo)
                     ).Where(
                         x => x.TimePoint >= timeStart && x.TimePoint < timeEnd
                     ).ToArray()
-                });
+                };
+                return View(result);
             }
         }
 

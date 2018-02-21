@@ -26,28 +26,32 @@ namespace DayzlightAddonTests
                 Console.WriteLine("OK");
 
                 // Write movement data
-                int itersCount = 10;
-                int playersCount = 5;
+                int itersCount = 100;
+                var playerCount = 15;
+                var players = new double[playerCount, 2];
                 var rand = new Random();
                 for (int i = 1; i <= itersCount; i++)
                 {
                     Console.Write($"Write movement data {i} of {itersCount}...");
                     var movs = "[";
-                    for (int p = 0; p < playersCount; p++)
+                    for (int p = 0; p < playerCount; p++)
                     {
+                        for (int d = 0; d < 2; d++)
+                        {
+                            if (players[p, d] == 0d) players[p, d] = (rand.NextDouble() * 5000) + 2500;
+                            players[p, d] += (rand.NextDouble() * 100) - 50;
+                        }
                         if (p != 0) movs += ",";
                         long uid = 76561198000000000;
                         double cord = (p * 100d) + (i * 100d);
-                        movs += $"[\"{uid + p}\", [{cord},{cord}],{rand.NextDouble() * 360d}]";
+                        movs += $"[\"{uid + p}\", \"Player_{p}\", [{players[p,0]},{players[p,1]}],{rand.NextDouble() * 360d}]";
                     }
                     movs += "]";
                     AddonWrapper.RVExtensionManaged(
                         $"[\"STAT\",[{movs}]]"
                     );
                     Console.WriteLine("OK");
-                    Console.Write("Wait 10 sec...");
-                    Thread.Sleep(10 * 1000); // 10 sec
-                    Console.WriteLine("OK");
+                    Thread.Sleep(1000);
                 }
 
                 Console.WriteLine("All tests compleated.");

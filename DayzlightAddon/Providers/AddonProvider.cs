@@ -3,6 +3,7 @@ using DayzlightCommon.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 
@@ -11,6 +12,7 @@ namespace DayzlightAddon.Providers
     public class AddonProvider : IDisposable
     {
         private DbProvider db_ = new DbProvider();
+        private Random random_ = new Random();
 
         public void ServerInit(A2Array a2arr)
         {
@@ -59,21 +61,45 @@ namespace DayzlightAddon.Providers
                     {
                         TimePoint = DateTime.UtcNow
                     });
-
-                    var movements = new List<PlayerMovementEntity>();
+                    
                     foreach(var movement in a2arr[0])
                     {
-                        movements.Add(new PlayerMovementEntity()
+                        var uid = Int64.Parse(movement[0]);
+                        string name = movement[1];
+                        var nameInfo = db_.PlayerNames.Include(
+                            x => x.PlayerInfo
+                        ).FirstOrDefault(
+                            x => x.PlayerInfo.Uid == uid && x.Name.Equals(name)
+                        );
+
+                        if (nameInfo == null)
                         {
-                            Uid = Int64.Parse(movement[0]),
+                            var playerInfo = db_.Players.FirstOrDefault(x => x.Uid == uid);
+                            if (playerInfo == null)
+                            {
+                                playerInfo = db_.Players.Add(new PlayerInfoEntity() {
+                                    Uid = uid,
+                                    Color = ColorUtils.DefaultPlayerColors[random_.Next(ColorUtils.DefaultPlayerColors.Length)]
+                                });
+                            }
+
+                            nameInfo = db_.PlayerNames.Add(new PlayerNameEntity()
+                            {
+                                Name = name,
+                                PlayerInfo = playerInfo
+                            });
+                        }
+
+                        db_.PlayerMovements.AddOrUpdate(new PlayerMovementEntity()
+                        {
+                            PlayerName = nameInfo,
                             Timepoint = timepoint,
-                            PosX = movement[1][0],
-                            PosY = movement[1][1],
-                            Dir = movement[2]
+                            PosX = movement[2][0],
+                            PosY = movement[2][1],
+                            Dir = movement[3]
                         });
                     }
-
-                    db_.PlayerMovements.AddRange(movements);
+                    
                     db_.SaveChanges();
                     transaction.Commit();
                 }

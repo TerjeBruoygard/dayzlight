@@ -10,13 +10,27 @@
     <canvas id="timeline-canvas"></canvas>
 </div>
 <script>
-    // Fix circular dependencies on serialization
-    @foreach (var tp in Model.Timepoints) {
-        foreach(var mv in tp.PlayerMovements) {
-            mv.Timepoint = null;
-        }
+    var timePoints = [
+    @foreach(var tp in Model.Timepoints)
+    {
+    @:{
+    @:    TimePoint: "@Html.Raw(tp.TimePoint.ToString("o"))",
+    @:    PlayerMovements: [
+          foreach(var plmov in tp.PlayerMovements)
+          {
+    @:        {
+    @:            PosX: @Html.Raw(plmov.PosX),
+    @:            PosY: @Html.Raw(plmov.PosY),
+    @:            Dir: @Html.Raw(plmov.Dir),
+    @:            Name: "@Html.Raw(plmov.PlayerName.Name)",
+    @:            Uid: "@Html.Raw(plmov.PlayerName.PlayerInfo.Uid)",
+    @:            Color: "#@Html.Raw(plmov.PlayerName.PlayerInfo.Color)"
+    @:        },
+          }
+    @:    ]
+    @:},
     }
-    var timePoints = @Html.Raw(Json.Encode(Model.Timepoints));
+    ];
     var currentTimePointId = timePoints.length - 1;
     var updateMap;
 
@@ -110,7 +124,6 @@
                 ctx.drawImage(mapimg, 0, 0, mapwidth, mapheight);
 
                 var trailSize = 10;
-                ctx.fillStyle = ctx.strokeStyle = "#4c5ca5";
                 if (currentTimePointId >= 0) {
                     var drawCount = 0;
                     for (var drawId = currentTimePointId - trailSize < 0 ? 0 : currentTimePointId - trailSize;
@@ -124,10 +137,12 @@
                             var ang = 30;
                             var linew = Math.min(rad / 2, Math.max(1, (rad / 2)));
 
+                            ctx.fillStyle = ctx.strokeStyle = plmov.Color;
                             if (drawId > currentTimePointId - trailSize && timePoints[drawId - 1]) {
                                 var last = timePoints[drawId - 1].PlayerMovements.find(function (x) {
                                     return x.Uid === plmov.Uid
                                 });
+                                
                                 if (last) {
                                     ctx.lineWidth = linew;
                                     ctx.beginPath();
@@ -160,7 +175,7 @@
                                 ctx.fill();
 
                                 ctx.font = (rad * 1.6) + "px Helvetica, Arial, sans-serif";
-                                ctx.fillText(plmov.Uid, x + rad, y - rad);
+                                ctx.fillText(plmov.Name, x + rad, y - rad);
                             }
                             else {
                                 ctx.beginPath();
@@ -326,7 +341,7 @@
                 ctx.font = "12px Helvetica, Arial, sans-serif";
                 ctx.fillRect(carret.x, 0, 2, canvas.height);
                 if (currentTimePointId >= 0) {
-                    var date = new Date(parseInt(timePoints[currentTimePointId].TimePoint.substr(6)));
+                    var date = new Date(Date.parse(timePoints[currentTimePointId].TimePoint));
                     var date_utc = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
                     ctx.fillText(date_utc.toLocaleTimeString(), carret.x + 4, 14);
                 }
@@ -341,7 +356,7 @@
                 processResize();
                 redraw();
             }, false);
-            
+
             processResize();
             ctx.translate((canvas.width / 2) - ((timePoints.length - 1) * 10), 0);
             redraw();
@@ -367,7 +382,7 @@
                 dragStart = null;
             }, false);
 
-            var scaleFactor = -10;
+            var scaleFactor = 25;
             var zoom = function (clicks) {
                 var pt = ctx.transformedPoint(lastX, 0);
                 var factor = clicks * scaleFactor;
