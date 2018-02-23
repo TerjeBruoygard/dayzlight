@@ -11,7 +11,7 @@ namespace DayzlightCommon.Providers
     [DbConfigurationType(typeof(MySqlEFConfiguration))]
     public class DbProviderBase : DbContext
     {
-        public DbSet<ServerInfoEntity> ServerInfo { get; set; }
+        public DbSet<ServerRestartEntity> ServerRestartInfo { get; set; }
         public DbSet<AdminEntity> Admins { get; set; }
         public DbSet<TimepointEntity> Timepoints { get; set; }
         public DbSet<PlayerMovementEntity> PlayerMovements { get; set; }
@@ -27,7 +27,7 @@ namespace DayzlightCommon.Providers
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<ServerInfoEntity>();
+            modelBuilder.Entity<ServerRestartEntity>();
             modelBuilder.Entity<AdminEntity>();
             modelBuilder.Entity<TimepointEntity>();
             modelBuilder.Entity<PlayerMovementEntity>();

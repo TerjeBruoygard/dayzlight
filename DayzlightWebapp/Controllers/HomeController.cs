@@ -18,19 +18,79 @@ namespace DayzlightWebapp.Controllers
 
         public ActionResult Livemap()
         {
+            return Livemap(null);
+        }
+
+        [HttpPost]
+        public ActionResult Livemap(LivemapModel model)
+        {
+            ModelState.Clear();
             using (var db = new DbProvider())
             {
-                var timeStart = DateTime.Now.Date;
-                var timeEnd = DateTime.Now.Date.AddDays(1);
-
-                var result = new LivemapModel()
+                DateTime timeNow;
+                if (model == null)
                 {
-                    ServerInfo = db.ServerInfo.FirstOrDefault(),
-                    Timepoints = db.Timepoints.Include(
+                    timeNow = DateTime.UtcNow;
+                }
+                else
+                {
+                    if (model.PostAction == "SwitchRestart")
+                    {
+                        timeNow = DateTime.FromBinary(long.Parse(model.PostData));
+                    }
+                    else
+                    {
+                        throw new Exception("Unknown post action");
+                    }
+                }
+
+                var restarts = db.ServerRestartInfo.Where(
+                    x => x.TimePoint <= timeNow
+                ).OrderByDescending(
+                    x => x.TimePoint
+                ).Take(2).ToArray();
+
+                ServerRestartEntity lastRestart = null, curRestart = null;
+                if (restarts.Length >= 1)
+                {
+                    curRestart = restarts[0];
+                    if (restarts.Length == 2)
+                    {
+                        lastRestart = restarts[1];
+                    }
+                }
+
+                LivemapModel result = new LivemapModel();
+                if (curRestart != null)
+                {
+                    var nextRestart = db.ServerRestartInfo.Where(
+                        x => x.TimePoint > curRestart.TimePoint
+                    ).OrderBy(
+                        x => x.TimePoint
+                    ).FirstOrDefault();
+
+                    var timepoints = db.Timepoints.Include(
                         x => x.PlayerMovements.Select(y => y.PlayerName.PlayerInfo)
-                    ).Where(
-                        x => x.TimePoint >= timeStart && x.TimePoint < timeEnd
-                    ).ToArray()
+                    );
+
+                    if (nextRestart == null)
+                    {
+                        timepoints.Where(
+                            x => x.TimePoint > curRestart.TimePoint
+                        );
+                    }
+                    else
+                    {
+                        timepoints.Where(
+                            x => (x.TimePoint < nextRestart.TimePoint) &&
+                            (x.TimePoint > curRestart.TimePoint)
+                        );
+                    }
+
+                    result.ServerLastRestartInfo = lastRestart;
+                    result.ServerCurRestartInfo = curRestart;
+                    result.ServerNextRestartInfo = nextRestart;
+                    result.Timepoints = timepoints.ToArray();
                 };
                 return View(result);
             }

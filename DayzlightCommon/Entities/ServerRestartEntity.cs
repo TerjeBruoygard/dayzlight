@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DayzlightCommon.Entities {
-    public class ServerInfoEntity
+    public class ServerRestartEntity
     {
         [Key]
         [Required]
@@ -31,5 +31,9 @@ namespace DayzlightCommon.Entities {
 
         [Required]
         public Double SpawnPointY { get; set; }
+
+        [Index(IsUnique = true)]
+        [Required]
+        public DateTime TimePoint { set; get; }
     }
 }

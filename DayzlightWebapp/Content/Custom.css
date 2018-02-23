@@ -1,10 +1,29 @@
-﻿.span-invis-button {
+﻿.span-invis-button-disable {
+    cursor: default;
+    color: #444444;
+    font-size: 20px;
+    text-align: center;
+}
+
+.invis-button-disable {
+    cursor: default;
+    border: none;
+    background-color: transparent;
+    outline: none;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    padding: 15px;
+}
+
+.span-invis-button {
     color: #999999;
     font-size: 20px;
     text-align: center;
 }
 
-.invis-button:hover span {
+.invis-button:hover .span-invis-button {
     color: #dddddd;
 }
 

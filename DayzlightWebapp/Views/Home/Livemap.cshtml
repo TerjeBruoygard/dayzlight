@@ -7,21 +7,57 @@
     <canvas id="map-canvas"></canvas>
 </div>
 <div id="timeline-left-div" class="div-left-timeline">
-    <button class="invis-button" type="submit">
+@if (Model.ServerLastRestartInfo != null)
+{
+    <button class="invis-button" onclick="postAction('SwitchRestart', '@Html.Raw(Model.ServerLastRestartInfo.TimePoint.ToBinary())');">
         <span class="glyphicon glyphicon-backward span-invis-button"></span>
     </button>
+}
+else
+{
+    <button class="invis-button-disable">
+        <span class="glyphicon glyphicon-backward span-invis-button-disable"></span>
+    </button>
+}
 </div>
 <div id="timeline-div" class="div-timeline">
     <canvas id="timeline-canvas"></canvas>
 </div>
 <div id="timeline-right-div" class="div-right-timeline">
-    <button class="invis-button" type="submit">
+@if (Model.ServerNextRestartInfo != null)
+{
+    <button class="invis-button" onclick="postAction('SwitchRestart', '@Html.Raw(Model.ServerNextRestartInfo.TimePoint.ToBinary())');">
         <span class="glyphicon glyphicon-forward span-invis-button"></span>
     </button>
+}
+else
+{
+    <button class="invis-button-disable">
+        <span class="glyphicon glyphicon-forward span-invis-button-disable"></span>
+    </button>
+}
 </div>
 <script>
-    var timePoints = [
-    @foreach(var tp in Model.Timepoints)
+    var postAction = function (action, data) {
+        var args = {
+            "PostAction": action,
+            "PostData": data
+        };
+
+        $.ajax({
+        type: "POST",
+            url: "@Url.Action("Livemap")",
+            data: args,
+            success: function (msg) {
+            var newDoc = document.open("text/html", "replace");
+            newDoc.write(msg);
+            newDoc.close();
+        }
+    });
+    }
+
+var timePoints = [
+@foreach(var tp in Model.Timepoints)
     {
     @:{
     @:    TimePoint: "@Html.Raw(tp.TimePoint.ToString("o"))",
@@ -123,9 +159,9 @@
     function mapProcessing() {
         var canvas = document.getElementById("map-canvas");
         var mapimg = new Image;
-        var mapwidth = @Html.Raw(Model.ServerInfo.MaxCornerX - Model.ServerInfo.MinCornerX);
-        var mapheight = @Html.Raw(Model.ServerInfo.MaxCornerY - Model.ServerInfo.MinCornerY);
-        mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerInfo.WorldName + "/map.png")';
+        var mapwidth = @Html.Raw(Model.ServerCurRestartInfo.MaxCornerX - Model.ServerCurRestartInfo.MinCornerX);
+        var mapheight = @Html.Raw(Model.ServerCurRestartInfo.MaxCornerY - Model.ServerCurRestartInfo.MinCornerY);
+        mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
         window.addEventListener("load", function () {
             var ctx = null;
             // Draw player
@@ -191,7 +227,7 @@
                     if (isOverlay) {
                         linew += ((rad * sizeMod) - rad) * 2;
                     }
-                    
+
                     for (var drawId = currentTimePointId - pathLength >= 0 ? currentTimePointId - pathLength : 0;
                         drawId <= currentTimePointId; drawId++) {
                         timePoints[drawId].PlayerMovements.forEach(function (plmov) {
@@ -205,8 +241,8 @@
 
                             // Check by distance from spawn
                             skip |= hideSpawnTp && Math.sqrt(
-                                Math.pow(plmov.PosX - @Html.Raw(Model.ServerInfo.SpawnPointX), 2) +
-                                Math.pow(plmov.PosY - @Html.Raw(Model.ServerInfo.SpawnPointY), 2)
+                                Math.pow(plmov.PosX - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointX), 2) +
+                                Math.pow(plmov.PosY - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointY), 2)
                             ) < 100;
 
                             if (!skip) {
@@ -219,8 +255,8 @@
                                     });
 
                                     if (lastCandidate && (!hideSpawnTp || Math.sqrt(
-                                        Math.pow(lastCandidate.PosX - @Html.Raw(Model.ServerInfo.SpawnPointX), 2) +
-                                        Math.pow(lastCandidate.PosY - @Html.Raw(Model.ServerInfo.SpawnPointY), 2)
+                                        Math.pow(lastCandidate.PosX - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointX), 2) +
+                                        Math.pow(lastCandidate.PosY - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointY), 2)
                                     ) >= 100)) {
                                         last = lastCandidate;
                                     }
@@ -516,7 +552,7 @@
             canvas.addEventListener('mouseleave', function () {
                 dragStart = null;
             }, false);
-            
+
             var move = function (clicks) {
                 ctx.translate(clicks * -step, 0);
                 fixBounds();

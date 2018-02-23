@@ -21,24 +21,34 @@ namespace DayzlightAddon.Providers
                 try
                 {
                     // Clean old records
-                    var delDateTime = DateTime.UtcNow.AddDays(-1);
-                    db_.PlayerMovements.RemoveRange(
-                        db_.PlayerMovements.Where(x => x.Timepoint.TimePoint < delDateTime)
-                    );
-                    db_.Timepoints.RemoveRange(
-                        db_.Timepoints.Where(x => x.TimePoint < delDateTime)
-                    );
+                    var nowDateTime = DateTime.UtcNow;
+                    var delDateTime = DateTime.UtcNow.AddDays(-7);
+                    var lastRestartTime = db_.ServerRestartInfo.Where(
+                        x => x.TimePoint < delDateTime
+                    ).OrderByDescending(
+                        x => x.TimePoint
+                    ).FirstOrDefault();
+
+                    if (lastRestartTime != null)
+                    {
+                        db_.PlayerMovements.RemoveRange(
+                            db_.PlayerMovements.Where(x => x.Timepoint.TimePoint < lastRestartTime.TimePoint)
+                        );
+                        db_.Timepoints.RemoveRange(
+                            db_.Timepoints.Where(x => x.TimePoint < lastRestartTime.TimePoint)
+                        );
+                    }
 
                     // Update server info
-                    db_.ServerInfo.AddOrUpdate(new ServerInfoEntity() {
-                        Id = 1,
+                    db_.ServerRestartInfo.Add(new ServerRestartEntity() {
                         WorldName = a2arr[1],
                         MinCornerX = a2arr[2][0],
                         MinCornerY = a2arr[2][1],
                         MaxCornerX = a2arr[3][0],
                         MaxCornerY = a2arr[3][1],
                         SpawnPointX = a2arr[4][0],
-                        SpawnPointY = a2arr[4][1]
+                        SpawnPointY = a2arr[4][1],
+                        TimePoint = nowDateTime
                     });
                     db_.SaveChanges();
                     transaction.Commit();
