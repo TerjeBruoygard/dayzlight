@@ -55,7 +55,9 @@ if (isDedicated) then {
 ```{Arma2_RootServerFolder}\Dayzlight\DayzlightWebapp``` 
 as IIS service. *(Required IIS 6+ and NET Framework 4.5+ Classic)*
 
-6. In web browser visit IIS host address.
+6. In web browser visit IIS host address. 
+- *Internet explorer not supported. Recommended to use Google Chrome.*
+- *Default login: admin with password: admin*
 
 
 ### Troubleshooting
