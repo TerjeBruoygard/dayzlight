@@ -26,9 +26,9 @@ All features now in development:
 
 ### How to deploy
 
-1. Copy all from *"DayzlightAddon\bin\{Release|Debug}\"* to your Arma 2 (Dayz Mod) root server folder.
+1. Copy all from *"DayzlightAddon\bin\\{Release or Debug}\\"* to your Arma 2 (Dayz Mod) root server folder.
 
-2. Copy all from *"DayzlightWebapp\"* to *"{Arma2_RootServerFolder}\Dayzlight\DayzlightWebapp\"*
+2. Copy all from *"DayzlightWebapp\\"* to *"{Arma2_RootServerFolder}\Dayzlight\DayzlightWebapp\\"*
 
 
 ### How to use
