@@ -29,6 +29,7 @@ namespace DayzlightAddonTests
                 int itersCount = 100;
                 var playerCount = 15;
                 var players = new double[playerCount, 2];
+                var playersDir = new double[playerCount, 2];
                 var rand = new Random();
                 for (int i = 1; i <= itersCount; i++)
                 {
@@ -39,7 +40,8 @@ namespace DayzlightAddonTests
                         for (int d = 0; d < 2; d++)
                         {
                             if (players[p, d] == 0d) players[p, d] = (rand.NextDouble() * 5000) + 2500;
-                            players[p, d] += (rand.NextDouble() * 100) - 50;
+                            if (playersDir[p, d] == 0d) playersDir[p, d] = Math.Round(rand.NextDouble()) - 0.5d;
+                            players[p, d] += (100 + rand.NextDouble() * 200) * playersDir[p, d];
                         }
                         if (p != 0) movs += ",";
                         long uid = 76561198000000000;

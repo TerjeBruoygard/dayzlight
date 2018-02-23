@@ -38,6 +38,9 @@ else
 }
 </div>
 <script>
+    var mapimg = new Image;
+    mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
+
     var timePoints = [
     @foreach(var tp in Model.Timepoints)
     {
@@ -140,9 +143,6 @@ else
 
     function mapProcessing() {
         var canvas = document.getElementById("map-canvas");
-        var mapimg = new Image;
-        mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
-
         var mapwidth = @Html.Raw(Model.ServerCurRestartInfo.MaxCornerX - Model.ServerCurRestartInfo.MinCornerX);
         var mapheight = @Html.Raw(Model.ServerCurRestartInfo.MaxCornerY - Model.ServerCurRestartInfo.MinCornerY);
         var ctx = null;
