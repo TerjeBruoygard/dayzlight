@@ -31,6 +31,9 @@ namespace DayzlightAddon.Providers
 
                     if (lastRestartTime != null)
                     {
+                        db_.ServerRestartInfo.RemoveRange(
+                            db_.ServerRestartInfo.Where(x => x.TimePoint < lastRestartTime.TimePoint)
+                        );
                         db_.PlayerMovements.RemoveRange(
                             db_.PlayerMovements.Where(x => x.Timepoint.TimePoint < lastRestartTime.TimePoint)
                         );
