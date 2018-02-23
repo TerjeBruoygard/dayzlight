@@ -16,32 +16,19 @@ namespace DayzlightWebapp.Controllers
             return View();
         }
 
-        public ActionResult Livemap()
-        {
-            return Livemap(null);
-        }
-
-        [HttpPost]
-        public ActionResult Livemap(LivemapModel model)
+        public ActionResult Livemap(String restartTime)
         {
             ModelState.Clear();
             using (var db = new DbProvider())
             {
                 DateTime timeNow;
-                if (model == null)
+                if (restartTime == null)
                 {
                     timeNow = DateTime.UtcNow;
                 }
                 else
                 {
-                    if (model.PostAction == "SwitchRestart")
-                    {
-                        timeNow = DateTime.FromBinary(long.Parse(model.PostData));
-                    }
-                    else
-                    {
-                        throw new Exception("Unknown post action");
-                    }
+                    timeNow = DateTime.FromBinary(long.Parse(restartTime));
                 }
 
                 var restarts = db.ServerRestartInfo.Where(
@@ -69,28 +56,21 @@ namespace DayzlightWebapp.Controllers
                         x => x.TimePoint
                     ).FirstOrDefault();
 
-                    var timepoints = db.Timepoints.Include(
-                        x => x.PlayerMovements.Select(y => y.PlayerName.PlayerInfo)
+                    var timepoints = db.Timepoints.Where(
+                        x => x.TimePoint > curRestart.TimePoint
                     );
 
-                    if (nextRestart == null)
+                    if (nextRestart != null)
                     {
-                        timepoints.Where(
-                            x => x.TimePoint > curRestart.TimePoint
-                        );
-                    }
-                    else
-                    {
-                        timepoints.Where(
-                            x => (x.TimePoint < nextRestart.TimePoint) &&
-                            (x.TimePoint > curRestart.TimePoint)
-                        );
+                        timepoints = timepoints.Where(x => x.TimePoint < nextRestart.TimePoint);
                     }
 
                     result.ServerLastRestartInfo = lastRestart;
                     result.ServerCurRestartInfo = curRestart;
                     result.ServerNextRestartInfo = nextRestart;
-                    result.Timepoints = timepoints.ToArray();
+                    result.Timepoints = timepoints.Include(
+                        x => x.PlayerMovements.Select(y => y.PlayerName.PlayerInfo)
+                    ).ToArray();
                 };
                 return View(result);
             }

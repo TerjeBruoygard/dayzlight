@@ -9,7 +9,7 @@
 <div id="timeline-left-div" class="div-left-timeline">
 @if (Model.ServerLastRestartInfo != null)
 {
-    <button class="invis-button" onclick="postAction('SwitchRestart', '@Html.Raw(Model.ServerLastRestartInfo.TimePoint.ToBinary())');">
+    <button class="invis-button" onclick="location.href = '@Url.Action("Livemap", new { restartTime = Model.ServerLastRestartInfo.TimePoint.ToBinary() })'">
         <span class="glyphicon glyphicon-backward span-invis-button"></span>
     </button>
 }
@@ -26,7 +26,7 @@ else
 <div id="timeline-right-div" class="div-right-timeline">
 @if (Model.ServerNextRestartInfo != null)
 {
-    <button class="invis-button" onclick="postAction('SwitchRestart', '@Html.Raw(Model.ServerNextRestartInfo.TimePoint.ToBinary())');">
+    <button class="invis-button" onclick="location.href = '@Url.Action("Livemap", new { restartTime = Model.ServerNextRestartInfo.TimePoint.ToBinary() })'">
         <span class="glyphicon glyphicon-forward span-invis-button"></span>
     </button>
 }
@@ -38,26 +38,8 @@ else
 }
 </div>
 <script>
-    var postAction = function (action, data) {
-        var args = {
-            "PostAction": action,
-            "PostData": data
-        };
-
-        $.ajax({
-        type: "POST",
-            url: "@Url.Action("Livemap")",
-            data: args,
-            success: function (msg) {
-            var newDoc = document.open("text/html", "replace");
-            newDoc.write(msg);
-            newDoc.close();
-        }
-    });
-    }
-
-var timePoints = [
-@foreach(var tp in Model.Timepoints)
+    var timePoints = [
+    @foreach(var tp in Model.Timepoints)
     {
     @:{
     @:    TimePoint: "@Html.Raw(tp.TimePoint.ToString("o"))",
@@ -159,418 +141,424 @@ var timePoints = [
     function mapProcessing() {
         var canvas = document.getElementById("map-canvas");
         var mapimg = new Image;
+        mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
+
         var mapwidth = @Html.Raw(Model.ServerCurRestartInfo.MaxCornerX - Model.ServerCurRestartInfo.MinCornerX);
         var mapheight = @Html.Raw(Model.ServerCurRestartInfo.MaxCornerY - Model.ServerCurRestartInfo.MinCornerY);
-        mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
-        window.addEventListener("load", function () {
-            var ctx = null;
-            // Draw player
-            var drawPlayerIcon = function (x, y, rad, ang, dir, sizeMod, color) {
-                ctx.fillStyle = ctx.strokeStyle = color;
-                ctx.beginPath();
-                ctx.arc(x, y, rad * sizeMod, 0, 2 * Math.PI);
-                ctx.fill();
+        var ctx = null;
+        // Draw player
+        var drawPlayerIcon = function (x, y, rad, ang, dir, sizeMod, color) {
+            ctx.fillStyle = ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, rad * sizeMod, 0, 2 * Math.PI);
+            ctx.fill();
 
-                ctx.beginPath();
-                ctx.moveTo(
-                    x - (Math.sin(Math.radians(dir - ang)) * (rad * sizeMod)),
-                    y + (Math.cos(Math.radians(dir - ang)) * (rad * sizeMod))
-                );
-                ctx.lineTo(
-                    x - (Math.sin(Math.radians(dir)) * (rad * sizeMod * 1.6)),
-                    y + (Math.cos(Math.radians(dir)) * (rad * sizeMod * 1.6))
-                );
-                ctx.lineTo(
-                    x - (Math.sin(Math.radians(dir + ang)) * (rad * sizeMod)),
-                    y + (Math.cos(Math.radians(dir + ang)) * (rad * sizeMod))
-                );
-                ctx.closePath();
-                ctx.fill();
-            }
+            ctx.beginPath();
+            ctx.moveTo(
+                x - (Math.sin(Math.radians(dir - ang)) * (rad * sizeMod)),
+                y + (Math.cos(Math.radians(dir - ang)) * (rad * sizeMod))
+            );
+            ctx.lineTo(
+                x - (Math.sin(Math.radians(dir)) * (rad * sizeMod * 1.6)),
+                y + (Math.cos(Math.radians(dir)) * (rad * sizeMod * 1.6))
+            );
+            ctx.lineTo(
+                x - (Math.sin(Math.radians(dir + ang)) * (rad * sizeMod)),
+                y + (Math.cos(Math.radians(dir + ang)) * (rad * sizeMod))
+            );
+            ctx.closePath();
+            ctx.fill();
+        }
 
-            var drawPlayerName = function (x, y, rad, color, nameColor, nameText) {
-                var textHeight = rad * 1.8;
-                var textOffset = rad * 2;
-                ctx.font = textHeight + "px bold Helvetica, Arial, sans-serif";
+        var drawPlayerName = function (x, y, rad, color, nameColor, nameText) {
+            var textHeight = rad * 1.8;
+            var textOffset = rad * 2;
+            ctx.font = textHeight + "px bold Helvetica, Arial, sans-serif";
 
-                var width = ctx.measureText(nameText).width;
-                var offset = rad / 4;
-                ctx.fillStyle = color;
-                ctx.fillRect(x + textOffset - offset, y - textOffset - textHeight, width + (2 * offset), textHeight + (2 * offset));
+            var width = ctx.measureText(nameText).width;
+            var offset = rad / 4;
+            ctx.fillStyle = color;
+            ctx.fillRect(x + textOffset - offset, y - textOffset - textHeight, width + (2 * offset), textHeight + (2 * offset));
 
-                ctx.fillStyle = nameColor;
-                ctx.fillText(nameText, x + textOffset, y - textOffset);
-            }
+            ctx.fillStyle = nameColor;
+            ctx.fillText(nameText, x + textOffset, y - textOffset);
+        }
 
-            // Draw path for player
-            var drawPlayerPath = function (x1, y1, x2, y2, width, color) {
-                ctx.fillStyle = ctx.strokeStyle = color;
-                ctx.lineWidth = width;
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.stroke();
+        // Draw path for player
+        var drawPlayerPath = function (x1, y1, x2, y2, width, color) {
+            ctx.fillStyle = ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
 
-                ctx.beginPath();
-                ctx.arc(x2, y2, width * 0.5, 0, 2 * Math.PI);
-                ctx.fill();
-            }
+            ctx.beginPath();
+            ctx.arc(x2, y2, width * 0.5, 0, 2 * Math.PI);
+            ctx.fill();
+        }
 
-            var drawAllPlayers = function (p1, p2, isOverlay) {
-                if (currentTimePointId >= 0) {
-                    var rad = ((p2.x - Math.max(0, p1.x)) / (canvas.width * 0.15)) * iconsSize;
-                    var ang = 45;
-                    var sizeMod = isOverlay ? 1.4 : 1;
-                    var linew = Math.min(rad / 2, Math.max(1, (rad / 2)));
-                    var playerHeads = [];
+        var drawAllPlayers = function (p1, p2, isOverlay) {
+            if (currentTimePointId >= 0) {
+                var rad = ((p2.x - Math.max(0, p1.x)) / (canvas.width * 0.15)) * iconsSize;
+                var ang = 45;
+                var sizeMod = isOverlay ? 1.4 : 1;
+                var linew = Math.min(rad / 2, Math.max(1, (rad / 2)));
+                var playerHeads = [];
 
-                    if (isOverlay) {
-                        linew += ((rad * sizeMod) - rad) * 2;
-                    }
+                if (isOverlay) {
+                    linew += ((rad * sizeMod) - rad) * 2;
+                }
 
-                    for (var drawId = currentTimePointId - pathLength >= 0 ? currentTimePointId - pathLength : 0;
-                        drawId <= currentTimePointId; drawId++) {
-                        timePoints[drawId].PlayerMovements.forEach(function (plmov) {
-                            // Check if need to draw
-                            var skip = false;
+                for (var drawId = currentTimePointId - pathLength >= 0 ? currentTimePointId - pathLength : 0;
+                    drawId <= currentTimePointId; drawId++) {
+                    timePoints[drawId].PlayerMovements.forEach(function (plmov) {
+                        // Check if need to draw
+                        var skip = false;
 
-                            // Check by disconnect
-                            skip |= clearPathAfterDisconnect && !timePoints[currentTimePointId].PlayerMovements.find(function (x) {
-                                return x.Uid === plmov.Uid
-                            });
+                        // Check by disconnect
+                        skip |= clearPathAfterDisconnect && !timePoints[currentTimePointId].PlayerMovements.find(function (x) {
+                            return x.Uid === plmov.Uid
+                        });
 
-                            // Check by distance from spawn
-                            skip |= hideSpawnTp && Math.sqrt(
-                                Math.pow(plmov.PosX - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointX), 2) +
-                                Math.pow(plmov.PosY - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointY), 2)
-                            ) < 100;
+                        // Check by distance from spawn
+                        skip |= hideSpawnTp && Math.sqrt(
+                            Math.pow(plmov.PosX - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointX), 2) +
+                            Math.pow(plmov.PosY - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointY), 2)
+                        ) < 100;
 
-                            if (!skip) {
-                                // Calculate path
-                                var last = null;
-                                var fillColor = isOverlay ? iconsOverlayColor : plmov.Color;
-                                if (pathLength > 0 && drawId > 0 && timePoints[drawId - 1]) {
-                                    var lastCandidate = timePoints[drawId - 1].PlayerMovements.find(function (x) {
-                                        return x.Uid === plmov.Uid
-                                    });
+                        if (!skip) {
+                            // Calculate path
+                            var last = null;
+                            var fillColor = isOverlay ? iconsOverlayColor : plmov.Color;
+                            if (pathLength > 0 && drawId > 0 && timePoints[drawId - 1]) {
+                                var lastCandidate = timePoints[drawId - 1].PlayerMovements.find(function (x) {
+                                    return x.Uid === plmov.Uid
+                                });
 
-                                    if (lastCandidate && (!hideSpawnTp || Math.sqrt(
-                                        Math.pow(lastCandidate.PosX - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointX), 2) +
-                                        Math.pow(lastCandidate.PosY - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointY), 2)
-                                    ) >= 100)) {
-                                        last = lastCandidate;
-                                    }
-                                }
-
-                                // Draw body and path
-                                if (last) {
-                                    drawPlayerPath(plmov.PosX, mapheight - plmov.PosY, last.PosX, mapheight - last.PosY, linew, fillColor);
-                                }
-                                if (currentTimePointId == drawId) {
-                                    if (isOverlay) {
-                                        drawPlayerIcon(plmov.PosX, mapheight - plmov.PosY, rad, ang, plmov.Dir + 180, sizeMod, fillColor);
-                                    }
-                                    else {
-                                        playerHeads.push({
-                                            x: plmov.PosX,
-                                            y: mapheight - plmov.PosY,
-                                            dir: plmov.Dir + 180,
-                                            color: plmov.Color,
-                                            name: plmov.Name
-                                        });
-                                    }
+                                if (lastCandidate && (!hideSpawnTp || Math.sqrt(
+                                    Math.pow(lastCandidate.PosX - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointX), 2) +
+                                    Math.pow(lastCandidate.PosY - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointY), 2)
+                                ) >= 100)) {
+                                    last = lastCandidate;
                                 }
                             }
-                        });
-                    }
 
-                    if (!isOverlay) {
-                        // Draw heads
-                        playerHeads.forEach(function(i) {
-                            drawPlayerIcon(i.x, i.y, rad, ang, i.dir, sizeMod, i.color);
-                        });
+                            // Draw body and path
+                            if (last) {
+                                drawPlayerPath(plmov.PosX, mapheight - plmov.PosY, last.PosX, mapheight - last.PosY, linew, fillColor);
+                            }
+                            if (currentTimePointId == drawId) {
+                                if (isOverlay) {
+                                    drawPlayerIcon(plmov.PosX, mapheight - plmov.PosY, rad, ang, plmov.Dir + 180, sizeMod, fillColor);
+                                }
+                                else {
+                                    playerHeads.push({
+                                        x: plmov.PosX,
+                                        y: mapheight - plmov.PosY,
+                                        dir: plmov.Dir + 180,
+                                        color: plmov.Color,
+                                        name: plmov.Name
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }
 
-                        // Draw names
-                        playerHeads.forEach(function (i) {
-                            drawPlayerName(i.x, i.y, rad, iconsOverlayColor, i.color, i.name);
-                        });
-                    }
+                if (!isOverlay) {
+                    // Draw heads
+                    playerHeads.forEach(function (i) {
+                        drawPlayerIcon(i.x, i.y, rad, ang, i.dir, sizeMod, i.color);
+                    });
+
+                    // Draw names
+                    playerHeads.forEach(function (i) {
+                        drawPlayerName(i.x, i.y, rad, iconsOverlayColor, i.color, i.name);
+                    });
                 }
             }
+        }
 
-            // Redraw all canvas
-            var redraw = updateMap = function () {
-                // Clear canvas
-                var p1 = ctx.transformedPoint(0, 0);
-                var p2 = ctx.transformedPoint(canvas.width, canvas.height);
-                ctx.clearRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+        // Redraw all canvas
+        var redraw = updateMap = function () {
+            // Clear canvas
+            var p1 = ctx.transformedPoint(0, 0);
+            var p2 = ctx.transformedPoint(canvas.width, canvas.height);
+            ctx.clearRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
 
-                ctx.save();
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.restore();
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
 
-                // Draw map
-                ctx.drawImage(mapimg, 0, 0, mapwidth, mapheight);
+            // Draw map
+            ctx.drawImage(mapimg, 0, 0, mapwidth, mapheight);
 
-                // Draw players
-                drawAllPlayers(p1, p2, true);
-                drawAllPlayers(p1, p2, false);
+            // Draw players
+            drawAllPlayers(p1, p2, true);
+            drawAllPlayers(p1, p2, false);
+        }
+
+        var processResize = function () {
+            canvas.width = $("#map-div").innerWidth();
+            canvas.height = $("#map-div").innerHeight();
+        }
+
+        var resize = function (first) {
+            var matrix;
+            if (!first) {
+                matrix = ctx.getTransform();
             }
 
-            var processResize = function () {
-                canvas.width = $("#map-div").innerWidth();
-                canvas.height = $("#map-div").innerHeight();
+            processResize();
+            ctx = canvas.getContext('2d');
+            trackTransforms(ctx);
+
+            if (first) {
+                ctx.scale(0.25, 0.25);
+            }
+            else {
+                ctx.setTransform(
+                    matrix.a,
+                    matrix.b,
+                    matrix.c,
+                    matrix.d,
+                    matrix.e,
+                    matrix.f
+                );
             }
 
-            var resize = function (first) {
-                var matrix;
-                if (!first) {
-                    matrix = ctx.getTransform();
-                }
+            fixTranlation();
+            redraw();
+        };
 
-                processResize();
-                ctx = canvas.getContext('2d');
-                trackTransforms(ctx);
-
-                if (first) {
-                    ctx.scale(0.25, 0.25);
-                }
-                else {
-                    ctx.setTransform(
-                        matrix.a,
-                        matrix.b,
-                        matrix.c,
-                        matrix.d,
-                        matrix.e,
-                        matrix.f
-                    );
-                }
-
-                fixTranlation();
-                redraw();
-            };
-
-            var fixTranlation = function () {
-                var fixmin = ctx.transformedPoint(0, 0);
-                if (fixmin.x < 0) {
-                    ctx.translate(fixmin.x, 0);
-                }
-                if (fixmin.y < 0) {
-                    ctx.translate(0, fixmin.y);
-                }
-
-                var fixmax = ctx.transformedPoint(canvas.width, canvas.height);
-                if (fixmax.x > mapwidth) {
-                    ctx.translate((fixmax.x - mapwidth), 0);
-                }
-
-                if (fixmax.y > mapheight) {
-                    ctx.translate(0, (fixmax.y - mapheight));
-                }
+        var fixTranlation = function () {
+            var fixmin = ctx.transformedPoint(0, 0);
+            if (fixmin.x < 0) {
+                ctx.translate(fixmin.x, 0);
+            }
+            if (fixmin.y < 0) {
+                ctx.translate(0, fixmin.y);
             }
 
-            var dragStart = null;
-            var lastX = canvas.width / 2, lastY = canvas.height / 2;
-            resize(true);
-
-            canvas.addEventListener('mousedown', function (evt) {
-                document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
-                lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
-                lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-                dragStart = ctx.transformedPoint(lastX, lastY);
-            }, false);
-
-            canvas.addEventListener('mousemove', function (evt) {
-                lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
-                lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-                if (dragStart) {
-                    var pt = ctx.transformedPoint(lastX, lastY);
-                    ctx.translate(pt.x - dragStart.x, pt.y - dragStart.y);
-                    fixTranlation();
-                    redraw();
-                }
-            }, false);
-
-            canvas.addEventListener('mouseup', function (evt) {
-                dragStart = null;
-            }, false);
-
-            canvas.addEventListener('mouseleave', function () {
-                dragStart = null;
-            }, false);
-
-            var scaleFactor = 1.05;
-            var zoom = function (clicks) {
-                var pt = ctx.transformedPoint(lastX, lastY);
-                var min = ctx.transformedPoint(0, 0);
-                var max = ctx.transformedPoint(canvas.width, canvas.height);
-                var factor = Math.pow(scaleFactor, clicks);
-
-                var needScale = false;
-                if (factor > 1) {
-                    if (max.x - Math.max(0, min.x) > 1000 &&
-                        max.y - Math.max(0, min.y) > 1000) {
-                        needScale = true;
-                    }
-                }
-                else if (factor < 1) {
-                    if ((max.x - Math.max(0, min.x)) / factor < mapwidth &&
-                        (max.y - Math.max(0, min.y)) / factor < mapheight) {
-                        needScale = true;
-                    }
-                }
-
-                if (needScale) {
-                    ctx.translate(pt.x, pt.y);
-                    ctx.scale(factor, factor);
-                    ctx.translate(-pt.x, -pt.y);
-                }
-
-                fixTranlation();
-                redraw();
+            var fixmax = ctx.transformedPoint(canvas.width, canvas.height);
+            if (fixmax.x > mapwidth) {
+                ctx.translate((fixmax.x - mapwidth), 0);
             }
 
-            var handleScroll = function (evt) {
-                var delta = evt.wheelDelta ? evt.wheelDelta / 40 : evt.detail ? -evt.detail : 0;
-                if (delta) zoom(delta);
-                return evt.preventDefault() && false;
-            };
+            if (fixmax.y > mapheight) {
+                ctx.translate(0, (fixmax.y - mapheight));
+            }
+        }
 
-            canvas.addEventListener('DOMMouseScroll', handleScroll, false);
-            canvas.addEventListener('mousewheel', handleScroll, false);
-            window.addEventListener('resize', function () { resize(false); }, false);
+        var dragStart = null;
+        var lastX = canvas.width / 2, lastY = canvas.height / 2;
+        resize(true);
+
+        canvas.addEventListener('mousedown', function (evt) {
+            document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
+            lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+            lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+            dragStart = ctx.transformedPoint(lastX, lastY);
         }, false);
+
+        canvas.addEventListener('mousemove', function (evt) {
+            lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+            lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+            if (dragStart) {
+                var pt = ctx.transformedPoint(lastX, lastY);
+                ctx.translate(pt.x - dragStart.x, pt.y - dragStart.y);
+                fixTranlation();
+                redraw();
+            }
+        }, false);
+
+        canvas.addEventListener('mouseup', function (evt) {
+            dragStart = null;
+        }, false);
+
+        canvas.addEventListener('mouseleave', function () {
+            dragStart = null;
+        }, false);
+
+        var scaleFactor = 1.05;
+        var zoom = function (clicks) {
+            var pt = ctx.transformedPoint(lastX, lastY);
+            var min = ctx.transformedPoint(0, 0);
+            var max = ctx.transformedPoint(canvas.width, canvas.height);
+            var factor = Math.pow(scaleFactor, clicks);
+
+            var needScale = false;
+            if (factor > 1) {
+                if (max.x - Math.max(0, min.x) > 1000 &&
+                    max.y - Math.max(0, min.y) > 1000) {
+                    needScale = true;
+                }
+            }
+            else if (factor < 1) {
+                if ((max.x - Math.max(0, min.x)) / factor < mapwidth &&
+                    (max.y - Math.max(0, min.y)) / factor < mapheight) {
+                    needScale = true;
+                }
+            }
+
+            if (needScale) {
+                ctx.translate(pt.x, pt.y);
+                ctx.scale(factor, factor);
+                ctx.translate(-pt.x, -pt.y);
+            }
+
+            fixTranlation();
+            redraw();
+        }
+
+        var handleScroll = function (evt) {
+            var delta = evt.wheelDelta ? evt.wheelDelta / 40 : evt.detail ? -evt.detail : 0;
+            if (delta) zoom(delta);
+            return evt.preventDefault() && false;
+        };
+
+        canvas.addEventListener('DOMMouseScroll', handleScroll, false);
+        canvas.addEventListener('mousewheel', handleScroll, false);
+        window.addEventListener('resize', function () { resize(false); }, false);
     };
 
     function timelineProcessing() {
         var step = 10;
         var canvas = document.getElementById("timeline-canvas");
-        window.addEventListener("load", function () {
-            var ctx = null;
-            var redraw = function () {
-                // Clear the entire canvas
-                var p1 = ctx.transformedPoint(0, 0);
-                var p2 = ctx.transformedPoint(canvas.width, canvas.height);
-                ctx.clearRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+        var ctx = null;
+        var redraw = function () {
+            // Clear the entire canvas
+            var p1 = ctx.transformedPoint(0, 0);
+            var p2 = ctx.transformedPoint(canvas.width, canvas.height);
+            ctx.clearRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
 
-                ctx.save();
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.fillStyle = "#222222";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.restore();
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.fillStyle = "#222222";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
 
-                // Draw timeline
-                ctx.fillStyle = "#2C6330";
-                var i = 0;
-                timePoints.forEach(function (tp) {
-                    var divider = 1.1;
-                    if (i % 5 == 0) { divider = 1.4; }
-                    if (i % 10 == 0) { divider = 1.8; }
-                    if (i == timePoints.length - 1) {
-                        divider = 1.8;
-                        ctx.fillStyle = "#2C6330";
-                    }
-                    ctx.fillRect(i * step, canvas.height / divider, 1, canvas.height);
-                    ctx.fillStyle = "#999999";
-                    i++;
-                });
-
-                // Draw carret
-                var carret = ctx.transformedPoint(canvas.width / 2, 0);
-                var pointId = Math.floor(carret.x / step);
-                var newTimePointId = pointId < 0
-                    ? 0
-                    : timePoints[pointId]
-                        ? pointId
-                        : timePoints.length - 1;
-
-                if (newTimePointId != currentTimePointId) {
-                    currentTimePointId = newTimePointId;
-                    updateMap();
+            // Draw timeline
+            ctx.fillStyle = "#2C6330";
+            var i = 0;
+            timePoints.forEach(function (tp) {
+                var divider = 1.1;
+                if (i % 5 == 0) { divider = 1.4; }
+                if (i % 10 == 0) { divider = 1.8; }
+                if (i == timePoints.length - 1) {
+                    divider = 1.8;
+                    ctx.fillStyle = "#2C6330";
                 }
+                ctx.fillRect(i * step, canvas.height / divider, 1, canvas.height);
+                ctx.fillStyle = "#999999";
+                i++;
+            });
 
-                ctx.fillStyle = "#D62727";
-                ctx.font = "12px Helvetica, Arial, sans-serif";
-                ctx.fillRect(carret.x, 0, 2, canvas.height);
-                if (currentTimePointId >= 0) {
-                    var date_utc = Math.utc(timePoints[currentTimePointId].TimePoint);
-                    var date_width = ctx.measureText(date_utc.toLocaleDateString()).width;
-                    ctx.fillText(date_utc.toLocaleTimeString(), carret.x + 6, 14);
-                    ctx.fillText(date_utc.toLocaleDateString(), carret.x - 4 - date_width, 14);
-                }
+            // Draw carret
+            var carret = ctx.transformedPoint(canvas.width / 2, 0);
+            var pointId = Math.floor(carret.x / step);
+            var newTimePointId = pointId < 0
+                ? 0
+                : timePoints[pointId]
+                    ? pointId
+                    : timePoints.length - 1;
+
+            if (newTimePointId != currentTimePointId) {
+                currentTimePointId = newTimePointId;
+                updateMap();
             }
 
-            var processResize = function () {
-                canvas.width = $("#timeline-div").innerWidth();
-                canvas.height = $("#timeline-div").innerHeight();
+            ctx.fillStyle = "#D62727";
+            ctx.font = "12px Helvetica, Arial, sans-serif";
+            ctx.fillRect(carret.x, 0, 2, canvas.height);
+            if (currentTimePointId >= 0) {
+                var date_utc = Math.utc(timePoints[currentTimePointId].TimePoint);
+                var date_width = ctx.measureText(date_utc.toLocaleDateString()).width;
+                ctx.fillText(date_utc.toLocaleTimeString(), carret.x + 6, 14);
+                ctx.fillText(date_utc.toLocaleDateString(), carret.x - 4 - date_width, 14);
             }
+        }
 
-            var resize = function () {
-                processResize();
-                ctx = canvas.getContext('2d');
-                trackTransforms(ctx);
-                ctx.translate((canvas.width / 2) - ((timePoints.length - 1) * step), 0);
-                redraw();
+        var processResize = function () {
+            canvas.width = $("#timeline-div").innerWidth();
+            canvas.height = $("#timeline-div").innerHeight();
+        }
+
+        var resize = function () {
+            processResize();
+            ctx = canvas.getContext('2d');
+            trackTransforms(ctx);
+            @if (Model.ServerNextRestartInfo == null)
+            {
+                @: ctx.translate((canvas.width / 2) - ((timePoints.length - 1) * step), 0);
             }
-
-            var fixBounds = function () {
-                var pt = ctx.transformedPoint(canvas.width / 2, 0);
-                var maxBound = (timePoints.length - 1) * step;
-                if (pt.x < 0) {
-                    ctx.translate(pt.x, 0);
-                }
-                else if (pt.x > maxBound) {
-                    ctx.translate(pt.x - maxBound, 0);
-                }
+            else
+            {
+                @: ctx.translate((canvas.width / 2), 0);
             }
+            redraw();
+        }
 
-            resize();
+        var fixBounds = function () {
+            var pt = ctx.transformedPoint(canvas.width / 2, 0);
+            var maxBound = (timePoints.length - 1) * step;
+            if (pt.x < 0) {
+                ctx.translate(pt.x, 0);
+            }
+            else if (pt.x > maxBound) {
+                ctx.translate(pt.x - maxBound, 0);
+            }
+        }
 
-            var dragStart;
-            var lastX = 0;
-            canvas.addEventListener('mousedown', function (evt) {
-                document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
-                lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
-                dragStart = ctx.transformedPoint(lastX, 0);
-            }, false);
+        resize();
 
-            canvas.addEventListener('mousemove', function (evt) {
-                lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
-                if (dragStart) {
-                    var pt = ctx.transformedPoint(lastX, 0);
-                    ctx.translate(pt.x - dragStart.x, 0);
-                    fixBounds();
-                    redraw();
-                }
-            }, false);
+        var dragStart;
+        var lastX = 0;
+        canvas.addEventListener('mousedown', function (evt) {
+            document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
+            lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+            dragStart = ctx.transformedPoint(lastX, 0);
+        }, false);
 
-            canvas.addEventListener('mouseup', function (evt) {
-                dragStart = null;
-            }, false);
-
-            canvas.addEventListener('mouseleave', function () {
-                dragStart = null;
-            }, false);
-
-            var move = function (clicks) {
-                ctx.translate(clicks * -step, 0);
+        canvas.addEventListener('mousemove', function (evt) {
+            lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+            if (dragStart) {
+                var pt = ctx.transformedPoint(lastX, 0);
+                ctx.translate(pt.x - dragStart.x, 0);
                 fixBounds();
                 redraw();
             }
-
-            var handleScroll = function (evt) {
-                var delta = evt.wheelDelta ? evt.wheelDelta / 40 : evt.detail ? -evt.detail : 0;
-                if (delta) move(delta);
-                return evt.preventDefault() && false;
-            };
-
-            canvas.addEventListener('DOMMouseScroll', handleScroll, false);
-            canvas.addEventListener('mousewheel', handleScroll, false);
-            window.addEventListener('resize', resize, false);
         }, false);
+
+        canvas.addEventListener('mouseup', function (evt) {
+            dragStart = null;
+        }, false);
+
+        canvas.addEventListener('mouseleave', function () {
+            dragStart = null;
+        }, false);
+
+        var move = function (clicks) {
+            ctx.translate(clicks * -step, 0);
+            fixBounds();
+            redraw();
+        }
+
+        var handleScroll = function (evt) {
+            var delta = evt.wheelDelta ? evt.wheelDelta / 40 : evt.detail ? -evt.detail : 0;
+            if (delta) move(delta);
+            return evt.preventDefault() && false;
+        };
+
+        canvas.addEventListener('DOMMouseScroll', handleScroll, false);
+        canvas.addEventListener('mousewheel', handleScroll, false);
+        window.addEventListener('resize', resize, false);
     };
 
-    timelineProcessing();
-    mapProcessing();
+    window.addEventListener("load", function () {
+        mapProcessing();
+        timelineProcessing();
+    }, false);
 </script>
