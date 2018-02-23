@@ -13,18 +13,20 @@ All features now in development:
 
 ### How to build and configurate
 
-1. Open solution using Visual Studio 2017.
+1. Install Visual Studio 2017 and NET Framework 4.6.2 *(If not installed)*
 
-2. Restore all depends as nuget packets.
+2. Open solution using Visual Studio 2017.
 
-3. For build addon and tests *(use only x86 compiler mode)*.
+3. Restore all depends as nuget packets.
 
-4. For build common and webapp *(use only Any CPU compiler mode)*. 
+4. For build addon and tests *(use only x86 compiler mode)*.
+
+5. For build common and webapp *(use only Any CPU compiler mode)*. 
 
 
 ### How to use
 
-1. Install MySQL server *(If not installed)*
+1. Install MySQL server and NET Framework 4.6.2 *(If not installed)*
 
 2. Copy DayzlightAddon.dll and Dayzlight folder from addon bin folder to your ArmA 2 (DayZ Mod) server root folder.
 
@@ -40,7 +42,7 @@ if (isDedicated) then {
 - *Schema in database will be created automatically on first webapp or addon run. Do not create empty schema manually. EntityFramework will do it itself, otherwise errors are possible.*
 - *MySQL user must have all rights on server for automatically create and configure schema.*
 
-5. Host DayzlightWebapp as IIS service.
+5. Host DayzlightWebapp as IIS service. *(Required IIS 6+ and NET Framework 4.5+ Classic)*
 
 6. In web browser visit IIS host address.
 
