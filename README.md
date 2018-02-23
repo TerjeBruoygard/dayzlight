@@ -26,23 +26,23 @@ All features now in development:
 
 1. Install MySQL server *(If not installed)*
 
-1. Copy DayzlightAddon.dll and Dayzlight folder from addon bin folder to your ArmA 2 (DayZ Mod) server root folder.
+2. Copy DayzlightAddon.dll and Dayzlight folder from addon bin folder to your ArmA 2 (DayZ Mod) server root folder.
 
-2. In end of your init.sqf mission file add this code:
+3. In end of your init.sqf mission file add this code:
 ```
 if (isDedicated) then { 
     [] execVM "\Dayzlight\DayzlightAddon.sqf"; 
 };
 ```
 
-3. Edit connection string to MySQL Server in DB.ini (in both Addon and Webapp)
+4. Edit connection string to MySQL Server in DB.ini (in both Addon and Webapp)
 - *Schema name should be different from your Dayz Mod database.*
 - *Schema in database will be created automatically on first webapp or addon run. Do not create empty schema manually. EntityFramework will do it itself, otherwise errors are possible.*
 - *MySQL user must have all rights on server for automatically create and configure schema.*
 
-4. Host DayzlightWebapp as IIS service.
+5. Host DayzlightWebapp as IIS service.
 
-5. In web browser visit IIS host address.
+6. In web browser visit IIS host address.
 
 
 ### Troubleshooting
