@@ -11,6 +11,6 @@ namespace DayzlightWebapp.Models
         public ServerRestartEntity ServerCurRestartInfo { set; get; }
         public ServerRestartEntity ServerNextRestartInfo { set; get; }
         public TimepointEntity[] Timepoints { set; get; }
-        public bool ExpandMenu { set; get; }
+        public LivemapSettingsEntity Settings { set; get; }
     }
 }

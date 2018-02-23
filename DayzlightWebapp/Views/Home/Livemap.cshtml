@@ -43,16 +43,18 @@ else
 </div>
 <div>
     <div id="map-menu-btn" class="div-map-btn"
-        style="visibility:@Html.Raw(!Model.ExpandMenu ? "visible" : "hidden")">
+        style="visibility:@Html.Raw(!Model.Settings.MenuExpanded ? "visible" : "hidden")">
         <button class="invis-button" 
-                onclick="getState.expm = true; showHideMenu();">
-            <span class="glyphicon glyphicon glyphicon-th span-invis-button" style="color:#ffffff"></span>
+                onclick="showHideMenu(true);"
+                style="padding-top:10px;">
+            <span class="glyphicon glyphicon glyphicon-th span-invis-button" 
+                  style="color:#ffffff; font-size:24px;"></span>
         </button>
     </div>
     <div id="map-menu-div" class="div-map-menu" 
-         style="width: 250px; bottom:@Html.Raw(bottomOffset)px; visibility:@Html.Raw(Model.ExpandMenu ? "visible" : "hidden")">
+         style="width: 250px; bottom:@Html.Raw(bottomOffset)px; visibility:@Html.Raw(Model.Settings.MenuExpanded ? "visible" : "hidden")">
         <button class="invis-button" 
-                onclick="getState.expm = false; showHideMenu();">
+                onclick="showHideMenu(false);">
             <span class="glyphicon glyphicon-chevron-right span-invis-button" style="color:#ffffff"></span>
         </button>
     </div>
@@ -90,16 +92,19 @@ else
     var iconsOverlayColor = "#666666aa";
     var iconsSize = 1;
     var getState = {
-        rtime: '@Html.Raw(Model.ServerCurRestartInfo.TimePoint.ToBinary())',
-        expm: @Html.Raw(Model.ExpandMenu.ToString().ToLower())
+        rtime: '@Html.Raw(Model.ServerCurRestartInfo.TimePoint.ToBinary())'
     };
 
     var redirectGetState = function () {
         location.href = '@Url.Action("Livemap")?' + jQuery.param(getState);
     }
 
-    var showHideMenu = function () {
-        if (getState.expm === true) {
+    var sendCommand = function (command, data) {
+        $.get('@Url.Action("Livemap")', { command: command, data: data });
+    }
+
+    var showHideMenu = function (show) {
+        if (show === true) {
             document.getElementById('map-menu-btn').style.visibility = 'hidden';
             document.getElementById('map-menu-div').style.visibility = 'visible';
         }
@@ -107,6 +112,7 @@ else
             document.getElementById('map-menu-div').style.visibility = 'hidden';
             document.getElementById('map-menu-btn').style.visibility = 'visible';
         }
+        sendCommand('@Html.Raw(nameof(Model.Settings.MenuExpanded))', show);
     }
 
     Math.utc = function(dt) {
@@ -626,7 +632,7 @@ else
         canvas.addEventListener('mousewheel', handleScroll, false);
         window.addEventListener('resize', resize, false);
     };
-    
+
     window.addEventListener("load", function () {
         mapProcessing();
         timelineProcessing();

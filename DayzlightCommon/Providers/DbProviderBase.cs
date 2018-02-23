@@ -13,6 +13,7 @@ namespace DayzlightCommon.Providers
     {
         public DbSet<ServerRestartEntity> ServerRestartInfo { get; set; }
         public DbSet<AdminEntity> Admins { get; set; }
+        public DbSet<LivemapSettingsEntity> LivemapSettings { get; set; }
         public DbSet<TimepointEntity> Timepoints { get; set; }
         public DbSet<PlayerMovementEntity> PlayerMovements { get; set; }
         public DbSet<PlayerInfoEntity> Players { get; set; }
@@ -29,6 +30,7 @@ namespace DayzlightCommon.Providers
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<ServerRestartEntity>();
             modelBuilder.Entity<AdminEntity>();
+            modelBuilder.Entity<LivemapSettingsEntity>();
             modelBuilder.Entity<TimepointEntity>();
             modelBuilder.Entity<PlayerMovementEntity>();
             modelBuilder.Entity<PlayerInfoEntity>();

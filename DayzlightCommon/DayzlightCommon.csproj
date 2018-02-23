@@ -69,6 +69,7 @@
     <Compile Include="Entities\PlayerMovementEntity.cs" />
     <Compile Include="Entities\PlayerNameEntity.cs" />
     <Compile Include="Entities\ServerRestartEntity.cs" />
+    <Compile Include="Entities\LivemapSettingsEntity.cs" />
     <Compile Include="Entities\TimepointEntity.cs" />
     <Compile Include="Providers\DbProviderBase.cs" />
     <Compile Include="Utils\A2Array.cs" />

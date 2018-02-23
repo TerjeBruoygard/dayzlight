@@ -23,7 +23,17 @@ namespace DayzlightWebapp
                             contextDB.Admins.Add(new AdminEntity()
                             {
                                 Login = "admin",
-                                Password = "admin"
+                                Password = "admin",
+                                LivemapSettings = new LivemapSettingsEntity()
+                                {
+                                    MenuExpanded = true,
+                                    HideSpawnTp = true,
+                                    ClearPathAfterDisconnect = true,
+                                    OverlayIconsColor = "666666aa",
+                                    OverlayIconsSize = 1,
+                                    PlayersPathLength = 25,
+                                    TimelineExpanded = true
+                                }
                             });
                         }
                         contextDB.SaveChanges();

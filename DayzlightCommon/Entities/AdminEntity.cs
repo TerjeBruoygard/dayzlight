@@ -22,5 +22,8 @@ namespace DayzlightCommon.Entities
         [Display(Name = "Password")]
         [DataType(DataType.Password)]
         public String Password { get; set; }
+
+        [Required]
+        public LivemapSettingsEntity LivemapSettings { set; get; }
     }
 }
