@@ -32,7 +32,9 @@ namespace DayzlightWebapp
                                     OverlayIconsColor = "666666aa",
                                     OverlayIconsSize = 1,
                                     PlayersPathLength = 25,
-                                    TimelineExpanded = true
+                                    TimelineExpanded = true,
+                                    MenuGeneralExpanded = true,
+                                    MenuPlayersExpanded = true
                                 }
                             });
                         }

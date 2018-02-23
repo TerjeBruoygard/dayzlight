@@ -32,5 +32,11 @@ namespace DayzlightCommon.Entities
 
         [Required]
         public Boolean TimelineExpanded { get; set; }
+
+        [Required]
+        public Boolean MenuGeneralExpanded { get; set; }
+
+        [Required]
+        public Boolean MenuPlayersExpanded { get; set; }
     }
 }
