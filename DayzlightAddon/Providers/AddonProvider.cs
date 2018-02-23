@@ -77,7 +77,7 @@ namespace DayzlightAddon.Providers
                     
                     foreach(var movement in a2arr[0])
                     {
-                        var uid = Int64.Parse(movement[0]);
+                        var uid = movement[0];
                         string name = movement[1];
                         var nameInfo = db_.PlayerNames.Include(
                             x => x.PlayerInfo

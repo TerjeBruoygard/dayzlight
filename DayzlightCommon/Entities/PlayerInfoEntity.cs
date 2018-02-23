@@ -7,13 +7,15 @@ namespace DayzlightCommon.Entities
 {
     public class PlayerInfoEntity
     {
+        [Column(TypeName = "VARCHAR")]
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Index(IsUnique = true)]
         [Required]
-        public Int64 Uid { set; get; }
+        [StringLength(64)]
+        public String Uid { set; get; }
 
         [Required]
-        [StringLength(6)]
+        [StringLength(32)]
         public String Color { set; get; }
 
         public ICollection<PlayerNameEntity> Names { get; set; }

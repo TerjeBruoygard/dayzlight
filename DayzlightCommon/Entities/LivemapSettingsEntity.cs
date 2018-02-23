@@ -24,7 +24,7 @@ namespace DayzlightCommon.Entities
         public Boolean ClearPathAfterDisconnect { get; set; }
 
         [Required]
-        [StringLength(8)]
+        [StringLength(32)]
         public String OverlayIconsColor { get; set; }
 
         [Required]
