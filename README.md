@@ -26,9 +26,14 @@ All features now in development:
 
 ### How to deploy
 
-1. Copy all from *"DayzlightAddon\bin\\{Release or Debug}\\"* to your Arma 2 (Dayz Mod) root server folder.
+1. Copy all from 
+```DayzlightAddon\bin\{Release|Debug}\``` 
+to your Arma 2 (Dayz Mod) root server folder.
 
-2. Copy all from *"DayzlightWebapp\\"* to *"{Arma2_RootServerFolder}\Dayzlight\DayzlightWebapp\\"*
+2. Copy all from 
+```DayzlightWebapp\``` 
+to 
+```{Arma2_RootServerFolder}\Dayzlight\DayzlightWebapp\```
 
 
 ### How to use
@@ -40,12 +45,15 @@ if (isDedicated) then {
 };
 ```
 
-4. Edit connection string to MySQL Server in *"{Arma2_RootServerFolder}\Dayzlight\DB.ini"*
+4. Edit connection string to MySQL Server in
+```{Arma2_RootServerFolder}\Dayzlight\DB.ini```
 - *Schema name should be different from your Dayz Mod database.*
 - *Schema in database will be created automatically on first webapp or addon run. Do not create empty schema manually. EntityFramework will do it itself, otherwise errors are possible.*
 - *MySQL user must have all rights on server for automatically create and configure schema.*
 
-5. Host *"{Arma2_RootServerFolder}\Dayzlight\DayzlightWebapp"* as IIS service. *(Required IIS 6+ and NET Framework 4.5+ Classic)*
+5. Host 
+```{Arma2_RootServerFolder}\Dayzlight\DayzlightWebapp``` 
+as IIS service. *(Required IIS 6+ and NET Framework 4.5+ Classic)*
 
 6. In web browser visit IIS host address.
 
