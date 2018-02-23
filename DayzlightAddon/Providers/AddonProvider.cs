@@ -6,6 +6,7 @@ using System.Data.Entity.Migrations;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
+using System.Collections.Concurrent;
 
 namespace DayzlightAddon.Providers
 {
@@ -13,6 +14,8 @@ namespace DayzlightAddon.Providers
     {
         private DbProvider db_ = new DbProvider();
         private Random random_ = new Random();
+        private static Dictionary<string, Int64> PlayersCache_ = 
+            new Dictionary<string, Int64>();
 
         public void ServerInit(A2Array a2arr)
         {
@@ -74,45 +77,58 @@ namespace DayzlightAddon.Providers
                     {
                         TimePoint = DateTime.UtcNow
                     });
-                    
+
+                    var movementEntities = new List<PlayerMovementEntity>();
                     foreach(var movement in a2arr[0])
                     {
-                        var uid = movement[0];
+                        string uid = movement[0];
                         string name = movement[1];
-                        var nameInfo = db_.PlayerNames.Include(
-                            x => x.PlayerInfo
-                        ).FirstOrDefault(
-                            x => x.PlayerInfo.Uid == uid && x.Name.Equals(name)
-                        );
+                        string compaundCache = uid + "\n" + name;
 
-                        if (nameInfo == null)
+                        Int64 nameId = -1;
+                        if (!PlayersCache_.TryGetValue(compaundCache, out nameId))
                         {
-                            var playerInfo = db_.Players.FirstOrDefault(x => x.Uid == uid);
-                            if (playerInfo == null)
+                            var nameInfo = db_.PlayerNames.Include(
+                                x => x.PlayerInfo
+                            ).FirstOrDefault(
+                                x => x.PlayerInfo.Uid == uid && x.Name.Equals(name)
+                            );
+
+                            if (nameInfo == null)
                             {
-                                playerInfo = db_.Players.Add(new PlayerInfoEntity() {
-                                    Uid = uid,
-                                    Color = ColorUtils.DefaultPlayerColors[random_.Next(ColorUtils.DefaultPlayerColors.Length)]
+                                var playerInfo = db_.Players.FirstOrDefault(x => x.Uid == uid);
+                                if (playerInfo == null)
+                                {
+                                    playerInfo = db_.Players.Add(new PlayerInfoEntity()
+                                    {
+                                        Uid = uid,
+                                        Color = ColorUtils.DefaultPlayerColors[random_.Next(ColorUtils.DefaultPlayerColors.Length)]
+                                    });
+                                }
+
+                                nameInfo = db_.PlayerNames.Add(new PlayerNameEntity()
+                                {
+                                    Name = name,
+                                    PlayerInfo = playerInfo
                                 });
+                                db_.SaveChanges();
                             }
 
-                            nameInfo = db_.PlayerNames.Add(new PlayerNameEntity()
-                            {
-                                Name = name,
-                                PlayerInfo = playerInfo
-                            });
+                            nameId = nameInfo.Id;
+                            PlayersCache_.Add(compaundCache, nameId);
                         }
 
-                        db_.PlayerMovements.AddOrUpdate(new PlayerMovementEntity()
+                        movementEntities.Add(new PlayerMovementEntity()
                         {
-                            PlayerName = nameInfo,
+                            PlayerName_Id = nameId,
                             Timepoint = timepoint,
                             PosX = movement[2][0],
                             PosY = movement[2][1],
                             Dir = movement[3]
                         });
                     }
-                    
+
+                    db_.PlayerMovements.AddRange(movementEntities);
                     db_.SaveChanges();
                     transaction.Commit();
                 }

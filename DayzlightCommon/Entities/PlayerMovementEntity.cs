@@ -17,6 +17,8 @@ namespace DayzlightCommon.Entities
 
         [Index(IsUnique = false)]
         [Required]
+        [ForeignKey("PlayerName")]
+        public Int64 PlayerName_Id { set; get; }
         public PlayerNameEntity PlayerName { set; get; }
         
         [Required]
