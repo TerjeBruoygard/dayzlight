@@ -55,8 +55,22 @@ else
          style="width: 250px; bottom:@Html.Raw(bottomOffset)px; visibility:@Html.Raw(Model.Settings.MenuExpanded ? "visible" : "hidden")">
         <button class="invis-button" 
                 onclick="showHideMenu(false);">
-            <span class="glyphicon glyphicon-chevron-right span-invis-button" style="color:#ffffff"></span>
+            <span class="glyphicon glyphicon-chevron-right span-invis-button" style="color:#ffffff;">
+            </span>
+                    
         </button>
+        <b style="color: white; font-size: large">SETTINGS</b> 
+        <br>   
+        <div class="panel autocollapse">
+            <div class="panel-heading clickable">
+                <h3 class="panel-title">
+                    General
+                </h3>
+            </div>
+            <div class="panel-body">
+                
+            </div>
+        </div>
     </div>
 </div>
 <script>
@@ -89,7 +103,7 @@ else
     var pathLength = 10;
     var hideSpawnTp = true;
     var clearPathAfterDisconnect = true;
-    var iconsOverlayColor = "#666666aa";
+    var iconsOverlayColor = "rgba(102,102,102,0.8)";
     var iconsSize = 1;
     var getState = {
         rtime: '@Html.Raw(Model.ServerCurRestartInfo.TimePoint.ToBinary())'
@@ -537,7 +551,7 @@ else
                 var date_txt2 = date_utc.toLocaleDateString();
                 var date_txt1_width = ctx.measureText(date_txt1).width;
                 var date_txt2_width = ctx.measureText(date_txt2).width;
-                ctx.fillStyle = "#66666688";
+                ctx.fillStyle = "rgba(60,60,60,0.8)";
                 ctx.fillRect(carret.x - 6 - date_txt2_width, 0, date_txt1_width + date_txt2_width + 14, 16);
                 ctx.fillStyle = "#ffffff";
                 ctx.fillText(date_txt1, carret.x + 6, 14);
@@ -636,5 +650,18 @@ else
     window.addEventListener("load", function () {
         mapProcessing();
         timelineProcessing();
+
+        $(document).on('click', '.panel div.clickable', function (e) {
+            var $this = $(this);
+            var $panel = $this.parent('.panel');
+            var $panel_body = $panel.children('.panel-body');
+            var $display = $panel_body.css('display');
+
+            if ($display == 'block') {
+                $panel_body.slideUp();
+            } else if ($display == 'none') {
+                $panel_body.slideDown();
+            }
+        });
     }, false);
 </script>

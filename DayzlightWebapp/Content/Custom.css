@@ -1,4 +1,21 @@
-﻿.span-invis-button-disable {
+﻿.panel-title {
+    color: #ffffff !important;
+}
+
+.panel-heading {
+    background-color: rgba(36, 36, 36, 0.15) !important;
+}
+
+.panel {
+    background-color: rgba(36, 36, 36, 0.40) !important;
+    border-radius: 0 !important;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.span-invis-button-disable {
     cursor: default;
     color: #444444;
     font-size: 20px;
@@ -75,7 +92,7 @@
     right: 0;
     height: 50px;
     width: 50px;
-    background-color: #22222288;
+    background-color: rgba(34, 34, 34, 0.5);
 }
 
 .div-map-menu {
@@ -84,7 +101,7 @@
     position: fixed;
     top: 50px;
     right: 0;
-    background-color: #22222288;
+    background-color: rgba(34, 34, 34, 0.5);
 }
 
 .div-map {
