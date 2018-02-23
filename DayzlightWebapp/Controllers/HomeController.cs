@@ -16,19 +16,14 @@ namespace DayzlightWebapp.Controllers
             return View();
         }
 
-        public ActionResult Livemap(String restartTime)
+        public ActionResult Livemap(string rtime, string expm)
         {
             ModelState.Clear();
             using (var db = new DbProvider())
             {
-                DateTime timeNow;
-                if (restartTime == null)
-                {
-                    timeNow = DateTime.UtcNow;
-                }
-                else
-                {
-                    timeNow = DateTime.FromBinary(long.Parse(restartTime));
+                DateTime timeNow = DateTime.UtcNow;
+                if (rtime != null) {
+                    timeNow = DateTime.FromBinary(long.Parse(rtime));
                 }
 
                 var restarts = db.ServerRestartInfo.Where(
@@ -47,7 +42,11 @@ namespace DayzlightWebapp.Controllers
                     }
                 }
 
-                LivemapModel result = new LivemapModel();
+                LivemapModel result = new LivemapModel()
+                {
+                    ExpandMenu = expm == null || expm.Equals("true")
+                };
+
                 if (curRestart != null)
                 {
                     var nextRestart = db.ServerRestartInfo.Where(

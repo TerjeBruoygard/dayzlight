@@ -11,7 +11,8 @@
 <div id="timeline-left-div" class="div-left-timeline" style="height:@Html.Raw(bottomOffset)px">
 @if (Model.ServerLastRestartInfo != null)
 {
-    <button class="invis-button" onclick="location.href = '@Url.Action("Livemap", new { restartTime = Model.ServerLastRestartInfo.TimePoint.ToBinary() })'">
+    <button class="invis-button" 
+            onclick="getState.rtime = '@Html.Raw(Model.ServerLastRestartInfo.TimePoint.ToBinary())'; redirectGetState();">
         <span class="glyphicon glyphicon-backward span-invis-button"></span>
     </button>
 }
@@ -28,7 +29,8 @@ else
 <div id="timeline-right-div" class="div-right-timeline" style="height:@Html.Raw(bottomOffset)px">
 @if (Model.ServerNextRestartInfo != null)
 {
-    <button class="invis-button" onclick="location.href = '@Url.Action("Livemap", new { restartTime = Model.ServerNextRestartInfo.TimePoint.ToBinary() })'">
+    <button class="invis-button" 
+            onclick="getState.rtime = '@Html.Raw(Model.ServerNextRestartInfo.TimePoint.ToBinary())'; redirectGetState();">
         <span class="glyphicon glyphicon-forward span-invis-button"></span>
     </button>
 }
@@ -39,10 +41,26 @@ else
     </button>
 }
 </div>
+<div>
+    <div id="map-menu-btn" class="div-map-btn"
+        style="visibility:@Html.Raw(!Model.ExpandMenu ? "visible" : "hidden")">
+        <button class="invis-button" 
+                onclick="getState.expm = true; showHideMenu();">
+            <span class="glyphicon glyphicon glyphicon-th span-invis-button" style="color:#ffffff"></span>
+        </button>
+    </div>
+    <div id="map-menu-div" class="div-map-menu" 
+         style="width: 250px; bottom:@Html.Raw(bottomOffset)px; visibility:@Html.Raw(Model.ExpandMenu ? "visible" : "hidden")">
+        <button class="invis-button" 
+                onclick="getState.expm = false; showHideMenu();">
+            <span class="glyphicon glyphicon-chevron-right span-invis-button" style="color:#ffffff"></span>
+        </button>
+    </div>
+</div>
 <script>
     var mapimg = new Image;
     mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
-    
+
     var timePoints = [
     @foreach(var tp in Model.Timepoints)
     {
@@ -71,6 +89,25 @@ else
     var clearPathAfterDisconnect = true;
     var iconsOverlayColor = "#666666aa";
     var iconsSize = 1;
+    var getState = {
+        rtime: '@Html.Raw(Model.ServerCurRestartInfo.TimePoint.ToBinary())',
+        expm: @Html.Raw(Model.ExpandMenu.ToString().ToLower())
+    };
+
+    var redirectGetState = function () {
+        location.href = '@Url.Action("Livemap")?' + jQuery.param(getState);
+    }
+
+    var showHideMenu = function () {
+        if (getState.expm === true) {
+            document.getElementById('map-menu-btn').style.visibility = 'hidden';
+            document.getElementById('map-menu-div').style.visibility = 'visible';
+        }
+        else {
+            document.getElementById('map-menu-div').style.visibility = 'hidden';
+            document.getElementById('map-menu-btn').style.visibility = 'visible';
+        }
+    }
 
     Math.utc = function(dt) {
         var date = new Date(Date.parse(dt));
@@ -476,7 +513,7 @@ else
                             }
                         }
                         ctx.fillRect(i * step, (plq * 5) + padding, step, 3);
-                    }  
+                    }
                 });
 
                 i++;
@@ -589,7 +626,7 @@ else
         canvas.addEventListener('mousewheel', handleScroll, false);
         window.addEventListener('resize', resize, false);
     };
-
+    
     window.addEventListener("load", function () {
         mapProcessing();
         timelineProcessing();

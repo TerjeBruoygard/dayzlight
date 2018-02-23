@@ -69,6 +69,24 @@
     background-color: #222222;
 }
 
+.div-map-btn {
+    position: fixed;
+    top: 50px;
+    right: 0;
+    height: 50px;
+    width: 50px;
+    background-color: #22222288;
+}
+
+.div-map-menu {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    position: fixed;
+    top: 50px;
+    right: 0;
+    background-color: #22222288;
+}
+
 .div-map {
     overflow: hidden;
     position: fixed;
