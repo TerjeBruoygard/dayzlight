@@ -443,16 +443,41 @@ else
             // Draw timeline
             ctx.fillStyle = "#2C6330";
             var i = 0;
+            var padding = 2;
+            var ploffsets = [];
             timePoints.forEach(function (tp) {
-                var divider = 1.1;
-                if (i % 5 == 0) { divider = 1.4; }
-                if (i % 10 == 0) { divider = 1.8; }
-                if (i == timePoints.length - 1) {
-                    divider = 1.8;
+                // Draw marks
+                var yoffset = canvas.height / 1.1;
+                ctx.fillStyle = "#999999";
+                if (i % 5 == 0) { yoffset = canvas.height / 1.4; }
+                if (i % 10 == 0) { yoffset = canvas.height / 1.8; }
+                if (i == 0 || i == timePoints.length - 1) {
+                    yoffset = 0;
                     ctx.fillStyle = "#2C6330";
                 }
-                ctx.fillRect(i * step, canvas.height / divider, 1, canvas.height);
-                ctx.fillStyle = "#999999";
+                ctx.fillRect(i * step, yoffset + padding, 1, canvas.height - padding);
+
+                // Draw player lines
+                tp.PlayerMovements.forEach(function (plmov) {
+                    if (i < timePoints.length) {
+                        ctx.fillStyle = plmov.Color;
+                        var plq = ploffsets.findIndex(function (x) { return x == plmov.Uid });
+                        if (plq < 0) {
+                            var plq = 0;
+                            for (; plq < ploffsets.length; plq++) {
+                                if (!ploffsets[plq]) {
+                                    ploffsets[plq] = plmov.Uid;
+                                    break;
+                                }
+                            }
+                            if (plq == ploffsets.length) {
+                                ploffsets.push(plmov.Uid);
+                            }
+                        }
+                        ctx.fillRect(i * step, plq + padding, step, 1);
+                    }  
+                });
+
                 i++;
             });
 
