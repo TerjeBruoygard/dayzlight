@@ -48,7 +48,6 @@
     left: 50px;
     right: 50px;
     bottom: 0;
-    height: 50px;
     background-color: #222222;
 }
 
@@ -58,7 +57,6 @@
     left: 0;
     bottom: 0;
     width: 50px;
-    height: 50px;
     background-color: #222222;
 }
 
@@ -68,7 +66,6 @@
     right: 0;
     bottom: 0;
     width: 50px;
-    height: 50px;
     background-color: #222222;
 }
 
@@ -76,7 +73,6 @@
     overflow: hidden;
     position: fixed;
     top: 50px;
-    bottom: 50px;
     left: 0;
     right: 0;
     background-color: white;

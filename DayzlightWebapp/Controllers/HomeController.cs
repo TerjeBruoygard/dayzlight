@@ -69,7 +69,9 @@ namespace DayzlightWebapp.Controllers
                     result.ServerCurRestartInfo = curRestart;
                     result.ServerNextRestartInfo = nextRestart;
                     result.Timepoints = timepoints.Include(
-                        x => x.PlayerMovements.Select(y => y.PlayerName.PlayerInfo)
+                        x => x.PlayerMovements.Select(
+                            y => y.PlayerName.PlayerInfo
+                        )
                     ).ToArray();
                 };
                 return View(result);

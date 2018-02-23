@@ -1,12 +1,14 @@
 ﻿@model DayzlightWebapp.Models.LivemapModel
 @{
     System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+    var maxPlayers = Model.Timepoints.Max(x => x.PlayerMovements.Count);
+    var bottomOffset = (int)Math.Max(20 + (maxPlayers * 5), 50);
 }
 
-<div id="map-div" class="div-map">
+<div id="map-div" class="div-map" style="bottom:@Html.Raw(bottomOffset)px">
     <canvas id="map-canvas"></canvas>
 </div>
-<div id="timeline-left-div" class="div-left-timeline">
+<div id="timeline-left-div" class="div-left-timeline" style="height:@Html.Raw(bottomOffset)px">
 @if (Model.ServerLastRestartInfo != null)
 {
     <button class="invis-button" onclick="location.href = '@Url.Action("Livemap", new { restartTime = Model.ServerLastRestartInfo.TimePoint.ToBinary() })'">
@@ -20,10 +22,10 @@ else
     </button>
 }
 </div>
-<div id="timeline-div" class="div-timeline">
+<div id="timeline-div" class="div-timeline" style="height:@Html.Raw(bottomOffset)px">
     <canvas id="timeline-canvas"></canvas>
 </div>
-<div id="timeline-right-div" class="div-right-timeline">
+<div id="timeline-right-div" class="div-right-timeline" style="height:@Html.Raw(bottomOffset)px">
 @if (Model.ServerNextRestartInfo != null)
 {
     <button class="invis-button" onclick="location.href = '@Url.Action("Livemap", new { restartTime = Model.ServerNextRestartInfo.TimePoint.ToBinary() })'">
@@ -40,14 +42,14 @@ else
 <script>
     var mapimg = new Image;
     mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
-
+    
     var timePoints = [
     @foreach(var tp in Model.Timepoints)
     {
     @:{
     @:    TimePoint: "@Html.Raw(tp.TimePoint.ToString("o"))",
     @:    PlayerMovements: [
-          foreach(var plmov in tp.PlayerMovements)
+          foreach (var plmov in tp.PlayerMovements.OrderBy(x => x.PlayerName.PlayerInfo.Uid))
           {
     @:        {
     @:            PosX: @Html.Raw(plmov.PosX),
@@ -447,24 +449,23 @@ else
             var ploffsets = [];
             timePoints.forEach(function (tp) {
                 // Draw marks
-                var yoffset = canvas.height / 1.1;
+                var yoffset = canvas.height - 5;
                 ctx.fillStyle = "#999999";
-                if (i % 5 == 0) { yoffset = canvas.height / 1.4; }
-                if (i % 10 == 0) { yoffset = canvas.height / 1.8; }
+                if (i % 5 == 0) { yoffset -= 5; }
+                if (i % 10 == 0) { yoffset -= 5; }
                 if (i == 0 || i == timePoints.length - 1) {
                     yoffset = 0;
                     ctx.fillStyle = "#2C6330";
                 }
-                ctx.fillRect(i * step, yoffset + padding, 1, canvas.height - padding);
+                ctx.fillRect(i * step, yoffset + padding, 1, canvas.height - yoffset);
 
                 // Draw player lines
                 tp.PlayerMovements.forEach(function (plmov) {
-                    if (i < timePoints.length) {
+                    if (i < timePoints.length - 1) {
                         ctx.fillStyle = plmov.Color;
                         var plq = ploffsets.findIndex(function (x) { return x == plmov.Uid });
                         if (plq < 0) {
-                            var plq = 0;
-                            for (; plq < ploffsets.length; plq++) {
+                            for (plq = 0; plq < ploffsets.length; plq++) {
                                 if (!ploffsets[plq]) {
                                     ploffsets[plq] = plmov.Uid;
                                     break;
@@ -474,16 +475,33 @@ else
                                 ploffsets.push(plmov.Uid);
                             }
                         }
-                        ctx.fillRect(i * step, plq + padding, step, 1);
+                        ctx.fillRect(i * step, (plq * 5) + padding, step, 3);
                     }  
                 });
 
                 i++;
             });
 
-            // Draw carret
+            // Draw carret time
             var carret = ctx.transformedPoint(canvas.width / 2, 0);
             var pointId = Math.floor(carret.x / step);
+            ctx.fillStyle = "#D62727";
+            ctx.font = "12px Helvetica, Arial, sans-serif";
+            ctx.fillRect(carret.x, 0, 2, canvas.height);
+            if (currentTimePointId >= 0) {
+                var date_utc = Math.utc(timePoints[currentTimePointId].TimePoint);
+                var date_txt1 = date_utc.toLocaleTimeString();
+                var date_txt2 = date_utc.toLocaleDateString();
+                var date_txt1_width = ctx.measureText(date_txt1).width;
+                var date_txt2_width = ctx.measureText(date_txt2).width;
+                ctx.fillStyle = "#66666688";
+                ctx.fillRect(carret.x - 6 - date_txt2_width, 0, date_txt1_width + date_txt2_width + 14, 16);
+                ctx.fillStyle = "#ffffff";
+                ctx.fillText(date_txt1, carret.x + 6, 14);
+                ctx.fillText(date_txt2, carret.x - 4 - date_txt2_width, 14);
+            }
+
+            // Draw carret
             var newTimePointId = pointId < 0
                 ? 0
                 : timePoints[pointId]
@@ -493,16 +511,6 @@ else
             if (newTimePointId != currentTimePointId) {
                 currentTimePointId = newTimePointId;
                 updateMap();
-            }
-
-            ctx.fillStyle = "#D62727";
-            ctx.font = "12px Helvetica, Arial, sans-serif";
-            ctx.fillRect(carret.x, 0, 2, canvas.height);
-            if (currentTimePointId >= 0) {
-                var date_utc = Math.utc(timePoints[currentTimePointId].TimePoint);
-                var date_width = ctx.measureText(date_utc.toLocaleDateString()).width;
-                ctx.fillText(date_utc.toLocaleTimeString(), carret.x + 6, 14);
-                ctx.fillText(date_utc.toLocaleDateString(), carret.x - 4 - date_width, 14);
             }
         }
 
