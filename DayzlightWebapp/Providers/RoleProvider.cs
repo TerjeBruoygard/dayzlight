@@ -39,12 +39,14 @@ namespace DayzlightWebapp.Providers
 
         public override string[] GetRolesForUser(string username)
         {
-            var db = new DbProvider();
-            if (db.Admins.FirstOrDefault(x => x.Login.Equals(username)) != null)
+            using (var db = new DbProvider())
             {
-                return new string[] { "Administrator" };
+                if (db.Admins.FirstOrDefault(x => x.Login.Equals(username)) != null)
+                {
+                    return new string[] { "Administrator" };
+                }
+                return new string[] { };
             }
-            return new string[] { };
         }
 
         public override string[] GetUsersInRole(string roleName)

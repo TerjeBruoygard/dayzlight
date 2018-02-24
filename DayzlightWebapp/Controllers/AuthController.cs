@@ -1,5 +1,6 @@
 ﻿using DayzlightWebapp.Models;
 using DayzlightWebapp.Providers;
+using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -11,7 +12,9 @@ namespace DayzlightWebapp.Controllers
         [Authorize(Roles = "*")]
         public ActionResult Login()
         {
-            if (ModelState.IsValid && User.Identity.IsAuthenticated)
+            if (ModelState.IsValid &&
+                User.Identity.IsAuthenticated &&
+                Roles.GetRolesForUser(User.Identity.Name).Any(x => x.Equals("Administrator")))
             {
                 return RedirectToAction("General", "Home");
             }
