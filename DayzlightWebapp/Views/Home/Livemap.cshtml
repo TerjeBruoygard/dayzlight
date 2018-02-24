@@ -68,7 +68,8 @@ else
                 </h3>
             </div>
             <div class="panel-body">
-                
+                <input id="menuGeneralPathLength" data-slider-id='menuGeneralPathLengthSlider' 
+                       type="text" data-slider-min="0.1" data-slider-max="5.0" data-slider-step="0.01" data-slider-value="1" />
             </div>
         </div>
     </div>
@@ -523,7 +524,7 @@ else
                         var plq = ploffsets.findIndex(function (x) { return x == plmov.Uid });
                         if (plq < 0) {
                             for (plq = 0; plq < ploffsets.length; plq++) {
-                                if (!ploffsets[plq]) {
+                                if (!ploffsets[plq] || tp.PlayerMovements.findIndex(function (txx) { return txx.Uid == ploffsets[plq] }) == -1) {
                                     ploffsets[plq] = plmov.Uid;
                                     break;
                                 }
