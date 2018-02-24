@@ -1,4 +1,8 @@
-﻿.panel-title {
+﻿.slider-selection {
+    background: #BABABA;
+}
+
+.panel-title {
     color: #ffffff !important;
 }
 
@@ -87,6 +91,8 @@
 }
 
 .div-map-btn {
+    overflow-x: hidden;
+    overflow-y: hidden;
     position: fixed;
     top: 50px;
     right: 0;

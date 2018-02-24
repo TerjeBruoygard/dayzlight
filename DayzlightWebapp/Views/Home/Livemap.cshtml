@@ -52,7 +52,9 @@ else
         </button>
     </div>
     <div id="map-menu-div" class="div-map-menu" 
-         style="width: 250px; bottom:@Html.Raw(bottomOffset)px; visibility:@Html.Raw(Model.Settings.MenuExpanded ? "visible" : "hidden")">
+         style="width: 250px; bottom:@Html.Raw(bottomOffset)px; 
+         visibility:@Html.Raw(Model.Settings.MenuExpanded ? "visible" : "hidden");
+         overflow-y:@Html.Raw(Model.Settings.MenuExpanded ? "scroll" : "hidden");">
         <button class="invis-button" 
                 onclick="showHideMenu(false);">
             <span class="glyphicon glyphicon-chevron-right span-invis-button" style="color:#ffffff;">
@@ -68,8 +70,9 @@ else
                 </h3>
             </div>
             <div class="panel-body">
-                <input id="menuGeneralPathLength" data-slider-id='menuGeneralPathLengthSlider' 
-                       type="text" data-slider-min="0.1" data-slider-max="5.0" data-slider-step="0.01" data-slider-value="1" />
+                <input class="slider" type="text"
+                       data-slider-min="0.5" data-slider-max="4" 
+                       data-slider-step="0.1" data-slider-value="1"/>
             </div>
         </div>
     </div>
@@ -106,6 +109,7 @@ else
     var clearPathAfterDisconnect = true;
     var iconsOverlayColor = "rgba(102,102,102,0.8)";
     var iconsSize = 1;
+
     var getState = {
         rtime: '@Html.Raw(Model.ServerCurRestartInfo.TimePoint.ToBinary())'
     };
@@ -122,10 +126,12 @@ else
         if (show === true) {
             document.getElementById('map-menu-btn').style.visibility = 'hidden';
             document.getElementById('map-menu-div').style.visibility = 'visible';
+            document.getElementById('map-menu-div').style.overflowY = 'scroll';
         }
         else {
             document.getElementById('map-menu-div').style.visibility = 'hidden';
             document.getElementById('map-menu-btn').style.visibility = 'visible';
+            document.getElementById('map-menu-div').style.overflowY = 'hidden';
         }
         sendCommand('@Html.Raw(nameof(Model.Settings.MenuExpanded))', show);
     }
@@ -649,6 +655,12 @@ else
     };
 
     window.addEventListener("load", function () {
+        $('.slider').slider({
+            formatter: function (value) {
+                return value;
+            }
+        });
+
         mapProcessing();
         timelineProcessing();
 
