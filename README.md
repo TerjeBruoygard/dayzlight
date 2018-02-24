@@ -8,7 +8,7 @@ All features now in development:
 - List of players with statistics. *(not implemented)*
 - Server chat and log. *(not implemented)*
 	
-![Dayzlight webapp workspace](/README_IMG_v2.jpg)
+![Dayzlight webapp workspace](/README_IMG_V2.jpg)
 	
 
 ### How to build
