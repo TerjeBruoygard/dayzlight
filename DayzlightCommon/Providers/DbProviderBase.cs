@@ -23,7 +23,7 @@ namespace DayzlightCommon.Providers
           : base() { }
         
         public DbProviderBase(DbConnection existingConnection)
-          : base(existingConnection, false) { }
+          : base(existingConnection, true) { }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
