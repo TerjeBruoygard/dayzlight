@@ -25,7 +25,7 @@ namespace DayzlightWebapp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(SigninModel signinModel, string returnUrl)
         {
-            if (ModelState.IsValid)
+            if (signinModel != null && signinModel.Login != null && signinModel.Password != null)
             {
                 var authProvider = new AuthProvider();
                 if (authProvider.Login(signinModel))
