@@ -71,8 +71,14 @@ else
             </div>
             <div class="panel-body">
                 <div class="form-group">
+                    <label style="color:white">Size of icons:</label>
+                    <input id="OverlayIconsSize" class="slider _slider" type="text"
+                           data-slider-min="0.5" data-slider-max="2"
+                           data-slider-step="0.1" data-slider-value="@Html.Raw(Model.Settings.OverlayIconsSize)" />
+                </div>
+                <div class="form-group">
                     <label style="color:white">Players path length:</label>
-                    <input id="PlayersPathLength" class="slider" type="text"
+                    <input id="PlayersPathLength" class="slider _slider" type="text"
                            data-slider-min="0" data-slider-max="100"
                            data-slider-step="1" data-slider-value="@Html.Raw(Model.Settings.PlayersPathLength)" />
                 </div>
@@ -131,10 +137,10 @@ else
     var currentTimePointId = timePoints.length - 1;
     var updateMap;
     var pathLength = @Html.Raw(Model.Settings.PlayersPathLength);
-    var hideSpawnTp = true;
-    var clearPathAfterDisconnect = true;
+    var hideSpawnTp = @Html.Raw(Model.Settings.HideSpawnTp.ToString().ToLower());
+    var clearPathAfterDisconnect = @Html.Raw(Model.Settings.ClearPathAfterDisconnect.ToString().ToLower());
     var iconsOverlayColor = "rgba(102,102,102,0.8)";
-    var iconsSize = 1;
+    var iconsSize = @Html.Raw(Model.Settings.OverlayIconsSize);
 
     var getState = {
         rtime: '@Html.Raw(Model.ServerCurRestartInfo.TimePoint.ToBinary())'
@@ -692,6 +698,9 @@ else
             else if (name === "@Html.Raw(nameof(Model.Settings.ClearPathAfterDisconnect))") {
                 clearPathAfterDisconnect = value;
             }
+            else if (name === "@Html.Raw(nameof(Model.Settings.OverlayIconsSize))") {
+                iconsSize = value;
+            }
             else {
                 return;
             }
@@ -703,12 +712,14 @@ else
             onSettingChanged($(this).attr('id'), $(this).is(':checked'));
         });
 
-        $('.slider').slider({
-            formatter: function (value) {
-                return value;
-            }
-        }).on('slideStop', function (ev) {
-            onSettingChanged(ev.target.id, ev.value);
+        $('._slider').each(function () {
+            $(this).slider({
+                formatter: function (value) {
+                    return value;
+                }
+            }).on('slideStop', function (ev) {
+                onSettingChanged(ev.target.id, ev.value);
+            });
         });
 
         mapProcessing();

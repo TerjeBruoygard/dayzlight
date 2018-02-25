@@ -6,6 +6,8 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Data.Entity;
 using System.Reflection;
+using System.Threading;
+using System.Globalization;
 
 namespace DayzlightWebapp.Controllers
 {
@@ -19,6 +21,7 @@ namespace DayzlightWebapp.Controllers
 
         public ActionResult Livemap(string rtime, string command, string data)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             ModelState.Clear();
             using (var db = new DbProvider())
             {
