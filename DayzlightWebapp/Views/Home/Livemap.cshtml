@@ -86,18 +86,29 @@ else
                             }>
                             Hide players in spawn point
                         </label>
-                           </div>      
-                       </div>      
-                   </div>      
-               </div>       
-           </div>
-       </div>
-       <script>
-           var mapimg = new Image;
-                                   mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
+                    </div>      
+                </div>  
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label style="color:white">
+                            <input id="ClearPathAfterDisconnect" type="checkbox" class="_checkbox"
+                                   @if (Model.Settings.ClearPathAfterDisconnect) { 
+                                       @: checked="checked"
+                                    }>
+                            Clear path after disconnect
+                        </label>
+                    </div>
+                </div>
+            </div>      
+        </div>        
+    </div>
+</div>
+<script>
+    var mapimg = new Image;
+    mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
 
-                                   var timePoints = [
-                                   @foreach(var tp in Model.Timepoints)
+    var timePoints = [
+    @foreach(var tp in Model.Timepoints)
     {
     @:{
     @:    TimePoint: "@Html.Raw(tp.TimePoint.ToString("o"))",
@@ -677,6 +688,9 @@ else
             }
             else if (name === "@Html.Raw(nameof(Model.Settings.HideSpawnTp))") {
                 hideSpawnTp = value;
+            }
+            else if (name === "@Html.Raw(nameof(Model.Settings.ClearPathAfterDisconnect))") {
+                clearPathAfterDisconnect = value;
             }
             else {
                 return;
