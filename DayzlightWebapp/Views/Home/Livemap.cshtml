@@ -70,9 +70,12 @@ else
                 </h3>
             </div>
             <div class="panel-body">
-                <input class="slider" type="text"
-                       data-slider-min="0.5" data-slider-max="4" 
-                       data-slider-step="0.1" data-slider-value="1"/>
+                <div class="form-group">
+                    <label style="color:white">Players path length:</label>
+                    <input id="PlayersPathLength" class="slider" type="text"
+                           data-slider-min="0" data-slider-max="100"
+                           data-slider-step="1" data-slider-value="@Html.Raw(Model.Settings.PlayersPathLength)" />
+                </div>
             </div>
         </div>
     </div>
@@ -104,7 +107,7 @@ else
     ];
     var currentTimePointId = timePoints.length - 1;
     var updateMap;
-    var pathLength = 10;
+    var pathLength = @Html.Raw(Model.Settings.PlayersPathLength);
     var hideSpawnTp = true;
     var clearPathAfterDisconnect = true;
     var iconsOverlayColor = "rgba(102,102,102,0.8)";
@@ -275,7 +278,7 @@ else
                 if (isOverlay) {
                     linew += ((rad * sizeMod) - rad) * 2;
                 }
-
+                
                 for (var drawId = currentTimePointId - pathLength >= 0 ? currentTimePointId - pathLength : 0;
                     drawId <= currentTimePointId; drawId++) {
                     timePoints[drawId].PlayerMovements.forEach(function (plmov) {
@@ -659,7 +662,16 @@ else
             formatter: function (value) {
                 return value;
             }
-        });
+        }).on('slideStop', function (ev) {
+            if (ev.target.id === "@Html.Raw(nameof(Model.Settings.PlayersPathLength))") {
+                pathLength = ev.value;
+                updateMap();
+            }
+            else {
+                return;
+            }
+            sendCommand(ev.target.id, ev.value);
+        });;
 
         mapProcessing();
         timelineProcessing();

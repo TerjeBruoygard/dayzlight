@@ -31,7 +31,7 @@ namespace DayzlightWebapp
                                     ClearPathAfterDisconnect = true,
                                     OverlayIconsColor = "666666aa",
                                     OverlayIconsSize = 1,
-                                    PlayersPathLength = 25,
+                                    PlayersPathLength = 10,
                                     TimelineExpanded = true,
                                     MenuGeneralExpanded = true,
                                     MenuPlayersExpanded = true

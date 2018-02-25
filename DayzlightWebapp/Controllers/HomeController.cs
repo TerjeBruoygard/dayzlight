@@ -100,6 +100,7 @@ namespace DayzlightWebapp.Controllers
                             if (field.PropertyType == typeof(bool)) field.SetValue(settings, data == "true");
                             else if (field.PropertyType == typeof(string)) field.SetValue(settings, data);
                             else if (field.PropertyType == typeof(double)) field.SetValue(settings, double.Parse(data));
+                            else if (field.PropertyType == typeof(short)) field.SetValue(settings, short.Parse(data));
                             else throw new Exception("Command type not supported.");
                             db.SaveChanges();
                             transaction.Commit();
