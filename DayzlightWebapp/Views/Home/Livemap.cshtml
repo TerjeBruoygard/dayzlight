@@ -76,16 +76,28 @@ else
                            data-slider-min="0" data-slider-max="100"
                            data-slider-step="1" data-slider-value="@Html.Raw(Model.Settings.PlayersPathLength)" />
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-    var mapimg = new Image;
-    mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label style="color:white">
+                        <input id="HideSpawnTp" type="checkbox" class="_checkbox"
+                            @if (Model.Settings.HideSpawnTp)
+                            {
+                                @:checked="checked" 
+                            }>
+                            Hide players in spawn point
+                        </label>
+                           </div>      
+                       </div>      
+                   </div>      
+               </div>       
+           </div>
+       </div>
+       <script>
+           var mapimg = new Image;
+                                   mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
 
-    var timePoints = [
-    @foreach(var tp in Model.Timepoints)
+                                   var timePoints = [
+                                   @foreach(var tp in Model.Timepoints)
     {
     @:{
     @:    TimePoint: "@Html.Raw(tp.TimePoint.ToString("o"))",
@@ -278,7 +290,7 @@ else
                 if (isOverlay) {
                     linew += ((rad * sizeMod) - rad) * 2;
                 }
-                
+
                 for (var drawId = currentTimePointId - pathLength >= 0 ? currentTimePointId - pathLength : 0;
                     drawId <= currentTimePointId; drawId++) {
                     timePoints[drawId].PlayerMovements.forEach(function (plmov) {
@@ -658,20 +670,32 @@ else
     };
 
     window.addEventListener("load", function () {
+        var onSettingChanged = function (name, value) {
+            console.log(name, value);
+            if (name === "@Html.Raw(nameof(Model.Settings.PlayersPathLength))") {
+                pathLength = value;
+            }
+            else if (name === "@Html.Raw(nameof(Model.Settings.HideSpawnTp))") {
+                hideSpawnTp = value;
+            }
+            else {
+                return;
+            }
+            updateMap();
+            sendCommand(name, value);
+        };
+
+        $('._checkbox').click(function () {
+            onSettingChanged($(this).attr('id'), $(this).is(':checked'));
+        });
+
         $('.slider').slider({
             formatter: function (value) {
                 return value;
             }
         }).on('slideStop', function (ev) {
-            if (ev.target.id === "@Html.Raw(nameof(Model.Settings.PlayersPathLength))") {
-                pathLength = ev.value;
-                updateMap();
-            }
-            else {
-                return;
-            }
-            sendCommand(ev.target.id, ev.value);
-        });;
+            onSettingChanged(ev.target.id, ev.value);
+        });
 
         mapProcessing();
         timelineProcessing();
