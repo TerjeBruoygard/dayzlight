@@ -47,11 +47,11 @@ namespace DayzlightAddonTests
                         if (p != 0) movs += ",";
                         long uid = 76561198000000000;
                         double cord = (p * 100d) + (i * 100d);
-                        movs += $"[\"{uid + p}\", \"Player_{p}\", [{players[p, 0]},{players[p, 1]}],{rand.NextDouble() * 360d}]";
+                        movs += $"[\"{uid + p}\", \"Player_{p}\", [{players[p, 0]},{players[p, 1]}],{rand.NextDouble() * 360d},\"\",0]";
                     }
                     movs += "]";
                     AddonWrapper.RVExtensionManaged(
-                        $"[\"STAT\",[{movs}]]"
+                        $"[\"STAT\",[15.5,30,{movs}]]"
                     );
                     Console.WriteLine("OK " + (DateTime.Now - start).TotalMilliseconds + "ms");
                     Thread.Sleep(1000);

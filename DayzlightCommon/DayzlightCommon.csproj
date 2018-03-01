@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\AdminEntity.cs" />
+    <Compile Include="Entities\VehicleType.cs" />
     <Compile Include="Entities\PlayerInfoEntity.cs" />
     <Compile Include="Entities\PlayerMovementEntity.cs" />
     <Compile Include="Entities\PlayerNameEntity.cs" />

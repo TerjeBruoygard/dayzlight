@@ -29,5 +29,12 @@ namespace DayzlightCommon.Entities
 
         [Required]
         public Double Dir { set; get; }
+
+        [Required]
+        [StringLength(64)]
+        public String VehicleModel { set; get; }
+
+        [Required]
+        public VehicleType VehicleType { set; get; }
     }
 }

@@ -16,6 +16,12 @@ namespace DayzlightCommon.Entities
         [Required]
         public DateTime TimePoint { set; get; }
 
+        [Required]
+        public Double ServerFpsMin { set; get; }
+
+        [Required]
+        public Double ServerFpsAvg { set; get; }
+
         public ICollection<PlayerMovementEntity> PlayerMovements { get; set; }
     }
 }
