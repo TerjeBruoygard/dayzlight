@@ -1,7 +1,7 @@
 ﻿@model DayzlightWebapp.Models.LivemapModel
 @{
     System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-    var maxPlayers = Model.Timepoints.Max(x => x.PlayerMovements.Count);
+    var maxPlayers = Model.Timepoints.Any() ? Model.Timepoints.Max(x => x.PlayerMovements.Count) : 0;
     var bottomOffset = (int)Math.Max(20 + (maxPlayers * 5), 50);
 }
 
@@ -111,7 +111,10 @@ else
 </div>
 <script>
     var mapimg = new Image;
-    mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
+    @if (Model.ServerCurRestartInfo != null)
+    {
+        @:mapimg.src = '@Html.Raw("/Content/Maps/" + Model.ServerCurRestartInfo.WorldName + "/map.png")';
+    }
 
     var timePoints = [
     @foreach(var tp in Model.Timepoints)
@@ -143,7 +146,7 @@ else
     var iconsSize = @Html.Raw(Model.Settings.OverlayIconsSize);
 
     var getState = {
-        rtime: '@Html.Raw(Model.ServerCurRestartInfo.TimePoint.ToBinary())'
+        rtime: '@Html.Raw(Model.ServerCurRestartInfo?.TimePoint.ToBinary())'
     };
 
     var redirectGetState = function () {
@@ -241,9 +244,16 @@ else
 
     function mapProcessing() {
         var canvas = document.getElementById("map-canvas");
-        var mapwidth = @Html.Raw(Model.ServerCurRestartInfo.MaxCornerX - Model.ServerCurRestartInfo.MinCornerX);
-        var mapheight = @Html.Raw(Model.ServerCurRestartInfo.MaxCornerY - Model.ServerCurRestartInfo.MinCornerY);
+        var mapwidth = 0;
+        var mapheight = 0;
         var ctx = null;
+
+        @if (Model.ServerCurRestartInfo != null)
+        {
+            @:mapwidth = @Html.Raw(Model.ServerCurRestartInfo.MaxCornerX - Model.ServerCurRestartInfo.MinCornerX);
+            @:mapheight = @Html.Raw(Model.ServerCurRestartInfo.MaxCornerY - Model.ServerCurRestartInfo.MinCornerY);
+        }
+
         // Draw player
         var drawPlayerIcon = function (x, y, rad, ang, dir, sizeMod, color) {
             ctx.fillStyle = ctx.strokeStyle = color;
@@ -308,6 +318,10 @@ else
                     linew += ((rad * sizeMod) - rad) * 2;
                 }
 
+                if (timePoints.length == 0) {
+                    return;
+                }
+
                 for (var drawId = currentTimePointId - pathLength >= 0 ? currentTimePointId - pathLength : 0;
                     drawId <= currentTimePointId; drawId++) {
                     timePoints[drawId].PlayerMovements.forEach(function (plmov) {
@@ -319,11 +333,14 @@ else
                             return x.Uid === plmov.Uid
                         });
 
-                        // Check by distance from spawn
-                        skip |= hideSpawnTp && Math.sqrt(
-                            Math.pow(plmov.PosX - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointX), 2) +
-                            Math.pow(plmov.PosY - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointY), 2)
-                        ) < 100;
+                        @if (Model.ServerCurRestartInfo != null)
+                        {
+                            // Check by distance from spawn
+                            @:skip |= hideSpawnTp && Math.sqrt(
+                            @:            Math.pow(plmov.PosX - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointX), 2) +
+                            @:            Math.pow(plmov.PosY - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointY), 2)
+                            @:        ) < 100;
+                        }
 
                         if (!skip) {
                             // Calculate path
@@ -334,11 +351,14 @@ else
                                     return x.Uid === plmov.Uid
                                 });
 
-                                if (lastCandidate && (!hideSpawnTp || Math.sqrt(
-                                    Math.pow(lastCandidate.PosX - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointX), 2) +
-                                    Math.pow(lastCandidate.PosY - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointY), 2)
-                                ) >= 100)) {
-                                    last = lastCandidate;
+                                @if (Model.ServerCurRestartInfo != null)
+                                {
+                                    @:if (lastCandidate && (!hideSpawnTp || Math.sqrt(
+                                    @:                    Math.pow(lastCandidate.PosX - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointX), 2) +
+                                    @:                    Math.pow(lastCandidate.PosY - @Html.Raw(Model.ServerCurRestartInfo.SpawnPointY), 2)
+                                    @:                ) >= 100)) {
+                                    @:    last = lastCandidate;
+                                    @:}
                                 }
                             }
 
@@ -584,7 +604,7 @@ else
             ctx.fillStyle = "#D62727";
             ctx.font = "12px Helvetica, Arial, sans-serif";
             ctx.fillRect(carret.x, 0, 2, canvas.height);
-            if (currentTimePointId >= 0) {
+            if (currentTimePointId >= 0 && timePoints.length > 0) {
                 var date_utc = Math.utc(timePoints[currentTimePointId].TimePoint);
                 var date_txt1 = date_utc.toLocaleTimeString();
                 var date_txt2 = date_utc.toLocaleDateString();

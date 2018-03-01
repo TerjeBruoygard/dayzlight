@@ -83,7 +83,11 @@ namespace DayzlightWebapp.Controllers
                                 y => y.PlayerName.PlayerInfo
                             )
                         ).ToArray();
-                    };
+                    }
+                    else
+                    {
+                        result.Timepoints = new TimepointEntity[0];
+                    }
                     return View(result);
                 }
                 else
