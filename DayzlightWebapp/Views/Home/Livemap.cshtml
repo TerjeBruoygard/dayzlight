@@ -278,18 +278,42 @@ else
             ctx.fill();
         }
 
-        var drawPlayerName = function (x, y, rad, color, nameColor, nameText) {
+        var drawPlayerName = function (drawedNames, x, y, rad, color, nameColor, nameText) {
             var textHeight = rad * 1.8;
             var textOffset = rad * 2;
-            ctx.font = textHeight + "px bold Helvetica, Arial, sans-serif";
-
-            var width = ctx.measureText(nameText).width;
             var offset = rad / 4;
+            var width = ctx.measureText(nameText).width + (2 * offset);
+            var height = textHeight + (2 * offset);
+            var found;
+            do {
+                found = false;
+                for (var i = 0; i < drawedNames.length; i++) {
+                    var n = drawedNames[i];
+                    var x1mod = x >= n.x || x + width >= n.x;
+                    var x2mod = x <= n.x + n.w || x + width <= n.x + n.w;
+                    var y1mod = y >= n.y || y + height >= n.y;
+                    var y2mod = y <= n.y + height || y + height <= n.y + height;
+                    if (x1mod && x2mod && y1mod && y2mod) {
+                        found = true;
+                        x = n.x;
+                        y = n.y + height + offset + 1;
+                        console.log("collision found!");
+                        break;
+                    }
+                }
+            } while (found);
+
+            ctx.font = textHeight + "px bold Helvetica, Arial, sans-serif";
             ctx.fillStyle = color;
-            ctx.fillRect(x + textOffset - offset, y - textOffset - textHeight, width + (2 * offset), textHeight + (2 * offset));
+            ctx.fillRect(x + textOffset - offset, y - textOffset - textHeight, width, height);
 
             ctx.fillStyle = nameColor;
             ctx.fillText(nameText, x + textOffset, y - textOffset);
+            drawedNames.push({
+                x: x,
+                y: y,
+                w: width
+            });
         }
 
         // Draw path for player
@@ -391,8 +415,9 @@ else
                     });
 
                     // Draw names
+                    var drawedNames = [];
                     playerHeads.forEach(function (i) {
-                        drawPlayerName(i.x, i.y, rad, iconsOverlayColor, i.color, i.name);
+                        drawPlayerName(drawedNames, i.x, i.y, rad, iconsOverlayColor, i.color, i.name);
                     });
                 }
             }
