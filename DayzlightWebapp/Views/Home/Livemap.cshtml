@@ -121,6 +121,7 @@ else
     {
     @:{
     @:    TimePoint: "@Html.Raw(tp.TimePoint.ToString("o"))",
+    @:    FpsInfo: { Min: @Html.Raw(tp.ServerFpsMin), Avg: @Html.Raw(tp.ServerFpsAvg) },
     @:    PlayerMovements: [
           foreach (var plmov in tp.PlayerMovements.OrderBy(x => x.PlayerName.PlayerInfo.Uid))
           {
@@ -130,7 +131,9 @@ else
     @:            Dir: @Html.Raw(plmov.Dir),
     @:            Name: "@Html.Raw(plmov.PlayerName.Name)",
     @:            Uid: "@Html.Raw(plmov.PlayerName.PlayerInfo.Uid)",
-    @:            Color: "#@Html.Raw(plmov.PlayerName.PlayerInfo.Color)"
+    @:            Color: "#@Html.Raw(plmov.PlayerName.PlayerInfo.Color)",
+    @:            VehicleModel: "@Html.Raw(plmov.VehicleModel)",
+    @:            VehicleType: "@Html.Raw(plmov.VehicleType)"
     @:        },
           }
     @:    ]
@@ -278,11 +281,16 @@ else
             ctx.fill();
         }
 
-        var drawPlayerName = function (drawedNames, x, y, rad, color, nameColor, nameText) {
+        var drawPlayerName = function (drawedNames, x, y, rad, color, nameColor, nameText, vehText) {
             var textHeight = rad * 1.8;
             var textOffset = rad * 2;
             var offset = rad / 4;
-            var width = ctx.measureText(nameText).width + (2 * offset);
+
+            vehText = vehText === "" ? "" : " (" + vehText + ")";
+            ctx.font = textHeight + "px bold Helvetica, Arial, sans-serif";
+            var nameWidth = ctx.measureText(nameText).width;
+            var vehWidth = ctx.measureText(vehText).width;
+            var width = nameWidth + vehWidth + (2 * offset);
             var height = textHeight + (2 * offset);
             var found;
             do {
@@ -297,18 +305,19 @@ else
                         found = true;
                         x = n.x;
                         y = n.y + height + offset + 1;
-                        console.log("collision found!");
                         break;
                     }
                 }
             } while (found);
 
-            ctx.font = textHeight + "px bold Helvetica, Arial, sans-serif";
             ctx.fillStyle = color;
             ctx.fillRect(x + textOffset - offset, y - textOffset - textHeight, width, height);
 
             ctx.fillStyle = nameColor;
             ctx.fillText(nameText, x + textOffset, y - textOffset);
+
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText(vehText, x + textOffset + nameWidth, y - textOffset);
             drawedNames.push({
                 x: x,
                 y: y,
@@ -400,7 +409,8 @@ else
                                         y: mapheight - plmov.PosY,
                                         dir: plmov.Dir + 180,
                                         color: plmov.Color,
-                                        name: plmov.Name
+                                        name: plmov.Name,
+                                        vehicleModel: plmov.VehicleModel
                                     });
                                 }
                             }
@@ -417,7 +427,7 @@ else
                     // Draw names
                     var drawedNames = [];
                     playerHeads.forEach(function (i) {
-                        drawPlayerName(drawedNames, i.x, i.y, rad, iconsOverlayColor, i.color, i.name);
+                        drawPlayerName(drawedNames, i.x, i.y, rad, iconsOverlayColor, i.color, i.name, i.vehicleModel);
                     });
                 }
             }
